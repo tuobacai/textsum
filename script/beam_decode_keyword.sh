@@ -1,5 +1,5 @@
-PY=../py/run.py
-BLEU=../py/multi-bleu.perl
+PY=../python/run.py
+BLEU=../python/multi-bleu.perl
 MODEL_DIR=../model/model_keyword
 TRAIN_PATH_FROM=../data/keyword/train_content.txt
 DEV_PATH_FROM=../data/keyword/dev_content.txt

@@ -1,4 +1,4 @@
-PY=../py/run.py
+PY=../python/run.py
 MODEL_DIR=../model/model_keyword
 TRAIN_PATH_FROM=../data/keyword/train_content.txt
 DEV_PATH_FROM=../data/keyword/dev_content.txt
