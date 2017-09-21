@@ -1,4 +1,4 @@
-PY=../python/run.py
+PY=../python/predict.py
 BLEU=../python/multi-bleu.perl
 MODEL_DIR=../model/model_keyword
 TRAIN_PATH_FROM=../data/keyword/train_content.txt
