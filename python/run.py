@@ -505,6 +505,176 @@ def evaluate(sess, model, data_set):
     return loss, ppx
 
 
+def beam_decode():
+
+    mylog("Reading Data...")
+
+    from_test = None
+
+    from_vocab_path, to_vocab_path, real_vocab_size_from, real_vocab_size_to = data_utils.get_vocab_info(FLAGS.data_cache_dir)
+    
+    FLAGS._buckets = _buckets
+    FLAGS._beam_buckets = _beam_buckets
+    FLAGS.real_vocab_size_from = real_vocab_size_from
+    FLAGS.real_vocab_size_to = real_vocab_size_to
+    
+    from_test = data_utils.prepare_test_data(
+        FLAGS.data_cache_dir,
+        FLAGS.test_path_from,
+        from_vocab_path)
+
+    test_data_bucket, test_data_order = read_data_test(from_test)
+
+    test_bucket_sizes = [len(test_data_bucket[b]) for b in xrange(len(_beam_buckets))]
+    test_total_size = int(sum(test_bucket_sizes))
+
+    # reports
+    mylog("from_vocab_size: {}".format(FLAGS.from_vocab_size))
+    mylog("to_vocab_size: {}".format(FLAGS.to_vocab_size))
+    mylog("_beam_buckets: {}".format(FLAGS._beam_buckets))
+    mylog("BEAM_DECODE:")
+    mylog("total: {}".format(test_total_size))
+    mylog("buckets: {}".format(test_bucket_sizes))
+    
+
+
+    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
+    config.gpu_options.allow_growth = FLAGS.allow_growth
+
+    with tf.Session(config=config) as sess:
+
+        # runtime profile
+        if FLAGS.profile:
+            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+            run_metadata = tf.RunMetadata()
+        else:
+            run_options = None
+            run_metadata = None
+
+        mylog("Creating Model")
+        model = create_model(sess, run_options, run_metadata)
+        show_all_variables()
+
+        sess.run(model.dropoutRate.assign(1.0))#把droup释放掉
+
+        start_id = 0
+        n_steps = 0
+        batch_size = FLAGS.batch_size
+    
+        dite = DataIterator(model, test_data_bucket, len(_beam_buckets), batch_size, None, data_order = test_data_order)
+        ite = dite.next_original()
+
+            
+        i_sent = 0
+
+        targets = []
+
+        for source_inputs, bucket_id, length in ite:
+
+            print("--- decoding {}/{} sent ---".format(i_sent, test_total_size))
+            i_sent += 1
+            
+
+            results = [] # (sentence,score)
+            scores = [0.0] * FLAGS.beam_size
+            sentences = [[] for x in xrange(FLAGS.beam_size)]
+            beam_parent = range(FLAGS.beam_size)
+
+            target_inputs = [data_utils.GO_ID] * FLAGS.beam_size
+            min_target_length = int(length * FLAGS.min_ratio) + 1
+            max_target_length = int(length * FLAGS.max_ratio) + 1 # include EOS
+            mylog('len:'+str(length)+';min_target_length'+str(min_target_length)+';max_target_length'+str(max_target_length))
+            for i in xrange(max_target_length):
+                if i == 0:
+                    top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i, sources = source_inputs, target_inputs = target_inputs)
+                else:
+
+                    top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i,  target_inputs = target_inputs, beam_parent = beam_parent)
+
+                # top_value = [array[batch_size, batch_size]]
+                # top_index = [array[batch_size, batch_size]]
+                # eos_value = [array[batch_size, 1] ]
+                                        
+                # expand
+                global_queue = []
+
+                if i == 0:
+                    nrow = 1
+                else:
+                    nrow = FLAGS.beam_size
+
+                if i == max_target_length - 1: # last_step
+                    for row in xrange(nrow):
+
+                        score = scores[row] + np.log(eos_value[0][row,0])
+                        word_index = data_utils.EOS_ID
+                        beam_index = row
+                        global_queue.append((score, beam_index, word_index))                         
+
+                else:
+                    for row in xrange(nrow):
+                        for col in xrange(top_index[0].shape[1]):
+                            score = scores[row] + np.log(top_value[0][row,col])
+                            word_index = top_index[0][row,col]
+                            beam_index = row
+
+                            global_queue.append((score, beam_index, word_index))                         
+
+                global_queue = sorted(global_queue, key = lambda x : -x[0])
+
+
+                if FLAGS.print_beam:
+                    print("--------- Step {} --------".format(i))
+
+                target_inputs = []
+                beam_parent = []
+                scores = []
+                temp_sentences = []
+
+                for j, (score, beam_index, word_index) in enumerate(global_queue):
+                    if word_index == data_utils.EOS_ID:
+                        if len(sentences[beam_index])+1 < min_target_length:
+                            continue
+
+                        results.append((sentences[beam_index] + [word_index], score))
+                        if FLAGS.print_beam:
+                            print("*Beam:{} Father:{} word:{} score:{}".format(j,beam_index,word_index,score))
+                        continue
+                    
+                    if FLAGS.print_beam:
+                        print("Beam:{} Father:{} word:{} score:{}".format(j,beam_index,word_index,score))
+                    beam_parent.append(beam_index)
+
+                    
+                    target_inputs.append(word_index)
+                    scores.append(score)
+                    temp_sentences.append(sentences[beam_index] + [word_index])
+                    
+                    if len(scores) >= FLAGS.beam_size:
+                        break
+                   
+                # can not fill beam_size, just repeat the last one
+                while len(scores) < FLAGS.beam_size and i < max_target_length - 1:
+                    beam_parent.append(beam_parent[-1])
+                    target_inputs.append(target_inputs[-1])
+                    scores.append(scores[-1])
+                    temp_sentences.append(temp_sentences[-1])
+                
+                sentences = temp_sentences
+                    
+                # print the 1 best 
+            results = sorted(results, key = lambda x: -x[1])
+
+            
+            targets.append(results[0][0])
+
+        data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
+
+        
+    
+
+
+
 def mkdir(path):
     if not os.path.exists(path):
         os.mkdir(path)
@@ -536,8 +706,15 @@ def parsing_flags():
 def main(_):
     
     parsing_flags()
+    
+    if FLAGS.mode == "TRAIN":
+        train()
 
-    train()
+
+    if FLAGS.mode == "BEAM_DECODE":
+        FLAGS.batch_size = FLAGS.beam_size
+        FLAGS.beam_search = True
+        beam_decode()
     
     logging.shutdown()
     

@@ -12,7 +12,7 @@ DECODE_OUTPUT=../data/keyword/test.output
 export CUDA_VISIBLE_DEVICES=1
 
 
-python $PY --mode BEAM_DECODE --model_dir $MODEL_DIR \
+python $PY --model_dir $MODEL_DIR \
     --test_path_from $TEST_PATH_FROM \
     --beam_size 10 --from_vocab_size 10000 --to_vocab_size 10000 --size 128 --num_layers 2 \
     --attention True --print_beam True --decode_output $DECODE_OUTPUT

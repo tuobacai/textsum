@@ -1,37 +1,23 @@
 # coding:utf-8
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
+import tensorflow as tf
+from tensorflow.python.client import timeline
+import sys
+import logging
+import numpy as np
+import time
 import math
 import os
-import random
-import sys
-import time
 
-import numpy as np
-from six.moves import xrange  # pylint: disable=redefined-builtin
-import tensorflow as tf
-import logging
 import data_utils
-from seqModel import SeqModel
-
-
+from seq2seqmodel import Seq2SeqModel
 from data_iterator import DataIterator
-from tensorflow.python.client import timeline
-
-from summary import ModelSummary, variable_summaries
-
-from google.protobuf import text_format
-
-
 
 ############################
 ######## MARK:FLAGS ########
 ############################
 
-# mode
-tf.app.flags.DEFINE_string("mode", "TRAIN", "TRAIN|FORCE_DECODE|BEAM_DECODE|DUMP_LSTM")
+# model
+tf.app.flags.DEFINE_string("mode", "TRAIN", "TRAIN|BEAM_DECODE")
 
 # datasets, paths, and preprocessing
 tf.app.flags.DEFINE_string("model_dir", "./model", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
@@ -45,55 +31,37 @@ tf.app.flags.DEFINE_string("test_path_to", "./test", "the absolute path of raw t
 
 tf.app.flags.DEFINE_string("decode_output", "./output", "beam search decode output.")
 
-
-tf.app.flags.DEFINE_string("force_decode_output", "force_decode.txt", "the file name of the score file as the output of force_decode. The file will be put at model_dir/force_decode_output")
-tf.app.flags.DEFINE_string("dump_lstm_output", "dump_lstm.pb", "the file to save hidden states as a protobuffer as the output of dump_lstm. The file will be put at model_dir/dump_lstm_output")
-
-
-
 # tuning hypers
 tf.app.flags.DEFINE_float("learning_rate", 0.5, "Learning rate.")
-tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.83,
-                          "Learning rate decays by this much.")
-tf.app.flags.DEFINE_float("max_gradient_norm", 5.0,
-                          "Clip gradients to this norm.")
+tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.83,"Learning rate decays by this much.")
+tf.app.flags.DEFINE_float("max_gradient_norm", 5.0,"Clip gradients to this norm.")
 tf.app.flags.DEFINE_float("keep_prob", 0.5, "dropout rate.")
-tf.app.flags.DEFINE_integer("batch_size", 64,
-                            "Batch size to use during training/evaluation.")
+tf.app.flags.DEFINE_integer("batch_size", 64,"Batch size to use during training/evaluation.")
 
 tf.app.flags.DEFINE_integer("from_vocab_size", 10000, "from vocabulary size.")
 tf.app.flags.DEFINE_integer("to_vocab_size", 10000, "to vocabulary size.")
 
 tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")
 tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
-tf.app.flags.DEFINE_integer("n_epoch", 500,
-                            "Maximum number of epochs in training.")
+tf.app.flags.DEFINE_integer("n_epoch", 500,"Maximum number of epochs in training.")
 
-# replaced by the bucket size
-# tf.app.flags.DEFINE_integer("L", 30,"max length")
-
-tf.app.flags.DEFINE_integer("n_bucket", 10,
-                            "num of buckets to run.")
-tf.app.flags.DEFINE_integer("patience", 10,"exit if the model can't improve for $patence evals")
+tf.app.flags.DEFINE_integer("n_bucket", 10,"num of buckets to run.")
+tf.app.flags.DEFINE_integer("patience", 10, "exit if the model can't improve for $patence evals")
 
 # devices
 tf.app.flags.DEFINE_string("N", "000", "GPU layer distribution: [input_embedding, lstm, output_embedding]")
 
 # training parameter
-tf.app.flags.DEFINE_boolean("withAdagrad", True,
-                            "withAdagrad.")
-tf.app.flags.DEFINE_boolean("fromScratch", True,
-                            "withAdagrad.")
-tf.app.flags.DEFINE_boolean("saveCheckpoint", False,
-                            "save Model at each checkpoint.")
+tf.app.flags.DEFINE_boolean("withAdagrad", True,"withAdagrad.")
+tf.app.flags.DEFINE_boolean("fromScratch", True,"withAdagrad.")
+tf.app.flags.DEFINE_boolean("saveCheckpoint", False, "save Model at each checkpoint.")
 tf.app.flags.DEFINE_boolean("profile", False, "False = no profile, True = profile")
 
 # for beam_decode
 tf.app.flags.DEFINE_integer("beam_size", 10,"the beam size")
-tf.app.flags.DEFINE_boolean("print_beam", False, "to print beam info")
+tf.app.flags.DEFINE_boolean("print_beam", True, "to print beam info")
 tf.app.flags.DEFINE_float("min_ratio", 0.5, "min_ratio.")
 tf.app.flags.DEFINE_float("max_ratio", 1.5, "max_ratio.")
-
 
 # GPU configuration
 tf.app.flags.DEFINE_boolean("allow_growth", False, "allow growth")
@@ -104,20 +72,36 @@ tf.app.flags.DEFINE_boolean("with_summary", False, "with_summary")
 # With Attention
 tf.app.flags.DEFINE_boolean("attention", False, "with_attention")
 
-
-
 FLAGS = tf.app.flags.FLAGS
 
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
-#_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
-# _buckets = [(10, 10), (22, 22)]
-# _beam_buckets = [10, 22]
 _buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
-# _beam_buckets = [30,35,40,41,42]
 _beam_buckets = [120,200,300,400,500]
 
 
+
+#日志函数
+def mylog(msg):
+    print(msg)
+    sys.stdout.flush()
+    logging.info(msg)
+
+def mylog_section(section_name):
+    mylog("======== {} ========".format(section_name))
+
+def mylog_line(section_name, message):
+    mylog("[{}] {}".format(section_name, message))
+
+def log_flags():
+    members = FLAGS.__dict__['__flags'].keys()
+    mylog_section("FLAGS")
+    for attr in members:
+        mylog("{}={}".format(attr, getattr(FLAGS, attr)))
+
+
+
+#读数据
 def read_data(source_path, target_path, max_size=None):
   """Read data from source and target files and put into buckets.
   Args:
@@ -153,48 +137,7 @@ def read_data(source_path, target_path, max_size=None):
         source, target = source_file.readline(), target_file.readline()
   return data_set
 
-
-def read_data_test(source_path):
-
-    order = []
-    data_set = [[] for _ in _beam_buckets]
-    with tf.gfile.GFile(source_path, mode="r") as source_file:
-        source = source_file.readline()
-        counter = 0
-        while source:
-            counter += 1
-            if counter % 100000 == 0:
-                print("  reading data line %d" % counter)
-                sys.stdout.flush()
-            source_ids = [int(x) for x in source.split()][::-1]
-            for bucket_id, source_size in enumerate(_beam_buckets):
-                if len(source_ids) < source_size:
-
-                    order.append((bucket_id, len(data_set[bucket_id])))
-                    data_set[bucket_id].append(source_ids)
-                    
-                    break
-            source = source_file.readline()
-    return data_set, order
-
-
-
-def mylog(msg):
-    print(msg)
-    sys.stdout.flush()
-    logging.info(msg)
-
-
-def mylog_section(section_name):
-    mylog("======== {} ========".format(section_name)) 
-
-def mylog_subsection(section_name):
-    mylog("-------- {} --------".format(section_name)) 
-
-def mylog_line(section_name, message):
-    mylog("[{}] {}".format(section_name, message))
-
-
+#创建模型
 def get_device_address(s):
     add = []
     if s == "":
@@ -205,33 +148,10 @@ def get_device_address(s):
 
     return add
 
-
-def dump_graph(fn):
-    graph = tf.get_default_graph()
-    graphDef = graph.as_graph_def()
-        
-    text = text_format.MessageToString(graphDef)
-    f = open(fn,'w')
-    f.write(text)
-    f.close()
-
-def show_all_variables():
-    all_vars = tf.global_variables()
-    for var in all_vars:
-        mylog(var.name)
-
-
-def log_flags():
-    members = FLAGS.__dict__['__flags'].keys()
-    mylog_section("FLAGS")
-    for attr in members:
-        mylog("{}={}".format(attr, getattr(FLAGS, attr)))
-
-
 def create_model(session, run_options, run_metadata):
     devices = get_device_address(FLAGS.N)
     dtype = tf.float32
-    model = SeqModel(FLAGS._buckets,
+    model = Seq2SeqModel(FLAGS._buckets,
                      FLAGS.size,
                      FLAGS.real_vocab_size_from,
                      FLAGS.real_vocab_size_to,
@@ -255,7 +175,7 @@ def create_model(session, run_options, run_metadata):
     ckpt = tf.train.get_checkpoint_state(FLAGS.saved_model_dir)
     # if FLAGS.recommend or (not FLAGS.fromScratch) and ckpt and tf.gfile.Exists(ckpt.model_checkpoint_path):
 
-    if FLAGS.mode == "DUMP_LSTM" or FLAGS.mode == "BEAM_DECODE" or FLAGS.mode == 'FORCE_DECODE' or (not FLAGS.fromScratch) and ckpt:
+    if FLAGS.mode == "BEAM_DECODE"  or (not FLAGS.fromScratch) and ckpt:
 
         mylog("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
@@ -263,9 +183,41 @@ def create_model(session, run_options, run_metadata):
         mylog("Created model with fresh parameters.")
         session.run(tf.global_variables_initializer())
     return model
+#输出数据
+def show_all_variables():
+    all_vars = tf.global_variables()
+    for var in all_vars:
+        mylog(var.name)
+
+#模型评价
+def evaluate(sess, model, data_set):
+    # Run evals on development set and print their perplexity/loss.
+    dropoutRateRaw = FLAGS.keep_prob
+    sess.run(model.dropout10_op)
+
+    start_id = 0
+    loss = 0.0
+    n_steps = 0
+    n_valids = 0
+    batch_size = FLAGS.batch_size
+
+    dite = DataIterator(model, data_set, len(FLAGS._buckets), batch_size, None)
+    ite = dite.next_sequence(stop=True)
+
+    for sources, inputs, outputs, weights, bucket_id in ite:
+        L = model.step(sess, sources, inputs, outputs, weights, bucket_id, forward_only=True)
+        loss += L
+        n_steps += 1
+        n_valids += np.sum(weights)
+
+    loss = loss / (n_valids)
+    ppx = math.exp(loss) if loss < 300 else float("inf")
+
+    sess.run(model.dropoutAssign_op)
+
+    return loss, ppx
 
 def train():
-
     # Read Data
     mylog_section("READ DATA")
 
@@ -274,6 +226,7 @@ def train():
     from_dev = None
     to_dev = None
 
+    #提取文本摘要,在创建词汇表过程中,from和to都应该合并统计
     from_train, to_train, from_dev, to_dev, _, _ = data_utils.prepare_data(
         FLAGS.data_cache_dir,
         FLAGS.train_path_from,
@@ -283,15 +236,15 @@ def train():
         FLAGS.from_vocab_size,
         FLAGS.to_vocab_size)
 
-    train_data_bucket = read_data(from_train,to_train)
-    dev_data_bucket = read_data(from_dev,to_dev)
-    _,_,real_vocab_size_from,real_vocab_size_to = data_utils.get_vocab_info(FLAGS.data_cache_dir)
-    
+    train_data_bucket = read_data(from_train, to_train)
+    dev_data_bucket = read_data(from_dev, to_dev)
+    _, _, real_vocab_size_from, real_vocab_size_to = data_utils.get_vocab_info(FLAGS.data_cache_dir)
+
     FLAGS._buckets = _buckets
     FLAGS.real_vocab_size_from = real_vocab_size_from
     FLAGS.real_vocab_size_to = real_vocab_size_to
 
-    #train_n_tokens = total training target size
+    # train_n_tokens = total training target size
     train_n_tokens = np.sum([np.sum([len(items[1]) for items in x]) for x in train_data_bucket])
     train_bucket_sizes = [len(train_data_bucket[b]) for b in xrange(len(_buckets))]
     train_total_size = float(sum(train_bucket_sizes))
@@ -322,14 +275,13 @@ def train():
     mylog("Total_steps:{}".format(total_steps))
     mylog("Steps_per_checkpoint: {}".format(steps_per_checkpoint))
 
-
     mylog_section("IN TENSORFLOW")
-    
-    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
+
+    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
     config.gpu_options.allow_growth = FLAGS.allow_growth
 
     with tf.Session(config=config) as sess:
-        
+
         # runtime profile
         if FLAGS.profile:
             run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
@@ -343,13 +295,6 @@ def train():
         mylog("Creating Model.. (this can take a few minutes)")
         model = create_model(sess, run_options, run_metadata)
 
-        if FLAGS.with_summary:
-            mylog("Creating ModelSummary")
-            modelSummary = ModelSummary()
-
-            mylog("Creating tf.summary.FileWriter")
-            summaryWriter = tf.summary.FileWriter(os.path.join(FLAGS.summary_dir , "train.summary"), sess.graph)
-
         mylog_section("All Variables")
         show_all_variables()
 
@@ -357,15 +302,16 @@ def train():
         mylog_section("Data Iterators")
 
         dite = DataIterator(model, train_data_bucket, len(train_buckets_scale), batch_size, train_buckets_scale)
-        
+
         iteType = 0
+        ite=None
         if iteType == 0:
             mylog("Itetype: withRandom")
             ite = dite.next_random()
         elif iteType == 1:
             mylog("Itetype: withSequence")
             ite = dite.next_sequence()
-        
+
         # statistics during training
         step_time, loss = 0.0, 0.0
         current_step = 0
@@ -378,20 +324,19 @@ def train():
         n_valid_sents = 0
         n_valid_words = 0
         patience = FLAGS.patience
-        
+
         mylog_section("TRAIN")
 
-        
         while current_step < total_steps:
-            
+
             # start
             start_time = time.time()
-            
+
             # data and train
             source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.next()
 
             L = model.step(sess, source_inputs, target_inputs, target_outputs, target_weights, bucket_id)
-            
+
             # loss and time
             step_time += (time.time() - start_time) / steps_per_checkpoint
 
@@ -406,12 +351,12 @@ def train():
 
             if current_step % steps_per_report == 0:
                 sect_name = "STEP {}".format(current_step)
-                msg = "StepTime: {:.2f} sec Speed: {:.2f} targets/s Total_targets: {}".format(report_time/steps_per_report, n_targets_report*1.0 / report_time, train_n_tokens)
-                mylog_line(sect_name,msg)
+                msg = "StepTime: {:.2f} sec Speed: {:.2f} targets/s Total_targets: {}".format(
+                    report_time / steps_per_report, n_targets_report * 1.0 / report_time, train_n_tokens)
+                mylog_line(sect_name, msg)
 
                 report_time = 0
                 n_targets_report = 0
-                
 
                 # Create the Timeline object, and write it to a json
                 if FLAGS.profile:
@@ -421,18 +366,15 @@ def train():
                         f.write(ctf)
                     exit()
 
-
-            
             if current_step % steps_per_checkpoint == 0:
 
                 i_checkpoint = int(current_step / steps_per_checkpoint)
-                
+
                 # train_ppx
                 loss = loss / n_valid_words
                 train_ppx = math.exp(float(loss)) if loss < 300 else float("inf")
                 learning_rate = model.learning_rate.eval()
-                
-                                
+
                 # dev_ppx
                 dev_loss, dev_ppx = evaluate(sess, model, dev_data_bucket)
 
@@ -441,20 +383,15 @@ def train():
                 msg = "Learning_rate: {:.4f} Dev_ppx: {:.2f} Train_ppx: {:.2f}".format(learning_rate, dev_ppx, train_ppx)
                 mylog_line(sect_name, msg)
 
-                if FLAGS.with_summary:
-                    # save summary
-                    _summaries = modelSummary.step_record(sess, train_ppx, dev_ppx)
-                    for _summary in _summaries:
-                        summaryWriter.add_summary(_summary, i_checkpoint)
-                
+
                 # save model per checkpoint
                 if FLAGS.saveCheckpoint:
                     checkpoint_path = os.path.join(FLAGS.saved_model_dir, "model")
                     s = time.time()
-                    model.saver.save(sess, checkpoint_path, global_step=i_checkpoint, write_meta_graph = False)
-                    msg = "Model saved using {:.2f} sec at {}".format(time.time()-s, checkpoint_path)
+                    model.saver.save(sess, checkpoint_path, global_step=i_checkpoint, write_meta_graph=False)
+                    msg = "Model saved using {:.2f} sec at {}".format(time.time() - s, checkpoint_path)
                     mylog_line(sect_name, msg)
-                    
+
                 # save best model
                 if dev_ppx < low_ppx:
                     patience = FLAGS.patience
@@ -462,8 +399,8 @@ def train():
                     low_ppx_step = current_step
                     checkpoint_path = os.path.join(FLAGS.saved_model_dir, "best")
                     s = time.time()
-                    model.best_saver.save(sess, checkpoint_path, global_step=0, write_meta_graph = False)
-                    msg = "Model saved using {:.2f} sec at {}".format(time.time()-s, checkpoint_path)
+                    model.best_saver.save(sess, checkpoint_path, global_step=0, write_meta_graph=False)
+                    msg = "Model saved using {:.2f} sec at {}".format(time.time() - s, checkpoint_path)
                     mylog_line(sect_name, msg)
                 else:
                     patience -= 1
@@ -474,41 +411,12 @@ def train():
 
                 # Save checkpoint and zero timer and loss.
                 step_time, loss, n_valid_sents, n_valid_words = 0.0, 0.0, 0, 0
-                
 
 
-def evaluate(sess, model, data_set):
-    # Run evals on development set and print their perplexity/loss.
-    dropoutRateRaw = FLAGS.keep_prob
-    sess.run(model.dropout10_op)
-
-    start_id = 0
-    loss = 0.0
-    n_steps = 0
-    n_valids = 0
-    batch_size = FLAGS.batch_size
-    
-    dite = DataIterator(model, data_set, len(FLAGS._buckets), batch_size, None)
-    ite = dite.next_sequence(stop = True)
-
-    for sources, inputs, outputs, weights, bucket_id in ite:
-        L = model.step(sess, sources, inputs, outputs, weights, bucket_id, forward_only = True)
-        loss += L
-        n_steps += 1
-        n_valids += np.sum(weights)
-
-    loss = loss/(n_valids)
-    ppx = math.exp(loss) if loss < 300 else float("inf")
-
-    sess.run(model.dropoutAssign_op)
-
-    return loss, ppx
-
-
+#参数函数
 def mkdir(path):
     if not os.path.exists(path):
         os.mkdir(path)
-
 
 def parsing_flags():
     # saved_model
@@ -523,23 +431,19 @@ def parsing_flags():
     mkdir(FLAGS.summary_dir)
 
     # for logs
-    log_path = os.path.join(FLAGS.model_dir,"log.{}.txt".format(FLAGS.mode))
+    log_path = os.path.join(FLAGS.model_dir, "log.{}.txt".format(FLAGS.mode))
     filemode = 'w' if FLAGS.fromScratch else "a"
-    logging.basicConfig(filename=log_path,level=logging.DEBUG, filemode = filemode)
-    
+    logging.basicConfig(filename=log_path, level=logging.DEBUG, filemode=filemode)
+
     FLAGS.beam_search = False
 
     log_flags()
 
-    
- 
-def main(_):
-    
+def main():
     parsing_flags()
-
-    train()
-    
-    logging.shutdown()
-    
-if __name__ == "__main__":
-    tf.app.run()
+    if FLAGS.mode == "TRAIN":
+        train()
+    else:
+        print ('This function for train!!')
+if __name__=='__main__':
+    tf.app.run(main=main())
