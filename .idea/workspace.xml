@@ -78,8 +78,8 @@
           <file leaf-file-name="seq2seqmodel.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/python_attention/seq2seqmodel.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="210">
-                  <caret line="157" column="22" selection-start-line="157" selection-start-column="22" selection-end-line="157" selection-end-column="22" />
+                <state relative-caret-position="360">
+                  <caret line="143" column="51" selection-start-line="143" selection-start-column="51" selection-end-line="143" selection-end-column="51" />
                   <folding>
                     <element signature="e#0#38#0" expanded="true" />
                   </folding>
@@ -769,8 +769,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/python_attention/seq2seqmodel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="157" column="22" selection-start-line="157" selection-start-column="22" selection-end-line="157" selection-end-column="22" />
+        <state relative-caret-position="360">
+          <caret line="143" column="51" selection-start-line="143" selection-start-column="51" selection-end-line="143" selection-end-column="51" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
