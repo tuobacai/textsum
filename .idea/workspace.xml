@@ -2,7 +2,45 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e7245e63-f68b-4b5c-a2e2-cbe5b6067f4d" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/train_model.py" afterPath="$PROJECT_DIR$/python/train_model.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/text.bin" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/generate_jobs.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/merge_jobs.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/read_hpc_output.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/state.proto" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/state.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/state_pb2.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python/test/test_data_util.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/best_buckets.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/data_iterator.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/data_utils.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/generate_jobs.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/merge_jobs.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/multi-bleu.perl" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/read_hpc_output.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/run.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/seq2seq.ipynb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/seqModel.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/state.proto" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/state.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/state_pb2.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/summary.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/test.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/test/test_data_util.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/best_buckets.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/data_iterator.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/data_utils.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/multi-bleu.perl" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/seqModel.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_v0/summary.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python/__init__.py" afterPath="$PROJECT_DIR$/python/text.bin" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python/predict.py" afterPath="$PROJECT_DIR$/python_v0/predict.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python/run.py" afterPath="$PROJECT_DIR$/python_v0/run.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python/train_model.py" afterPath="$PROJECT_DIR$/python_v0/train_model.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/best_buckets.py" afterPath="$PROJECT_DIR$/python/best_buckets.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/data_iterator.py" afterPath="$PROJECT_DIR$/python/data_iterator.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/seqModel.py" afterPath="$PROJECT_DIR$/python/seqModel.py" />
     </list>
     <ignored path="textsum.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,14 +61,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="read_hpc_output.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/python/read_hpc_output.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="seqModel.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/python/seqModel.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="7932">
+              <caret line="957" column="20" selection-start-line="957" selection-start-column="10" selection-end-line="957" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#38#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="train_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python/train_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="542" column="11" selection-start-line="542" selection-start-column="11" selection-end-line="542" selection-end-column="11" />
-              <folding>
-                <element signature="e#15#53#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="492">
+              <caret line="877" column="19" selection-start-line="877" selection-start-column="19" selection-end-line="877" selection-end-column="19" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -38,30 +96,8 @@
       <file leaf-file-name="predict.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/python/predict.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="462" column="28" selection-start-line="462" selection-start-column="28" selection-end-line="462" selection-end-column="28" />
-              <folding>
-                <element signature="e#15#53#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="train_keyword.sh" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/script/train_keyword.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="26" selection-start-line="14" selection-start-column="26" selection-end-line="14" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="train_translate.sh" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/script/train_translate.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
+            <state relative-caret-position="237">
+              <caret line="429" column="43" selection-start-line="429" selection-start-column="43" selection-end-line="429" selection-end-column="43" />
               <folding />
             </state>
           </provider>
@@ -97,16 +133,14 @@
         <option value="$PROJECT_DIR$/python/prdict.py" />
         <option value="$PROJECT_DIR$/script/train_keyword.sh" />
         <option value="$PROJECT_DIR$/script/beam_decode_keyword.sh" />
-        <option value="$PROJECT_DIR$/python/predict.py" />
         <option value="$PROJECT_DIR$/python/train_model.py" />
+        <option value="$PROJECT_DIR$/python/predict.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="265" />
-    <option name="y" value="23" />
     <option name="width" value="1280" />
-    <option name="height" value="733" />
+    <option name="height" value="800" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -161,21 +195,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="script" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="textsum" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="textsum" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="python" />
+              <option name="myItemId" value="python_v0" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -188,7 +208,8 @@
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$USER_HOME$/infoextract" />
+    <property name="last_opened_file_path" value="$USER_HOME$/gitcloneproject/xing_nlp" />
+    <property name="FullScreen" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -377,16 +398,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="265" y="23" width="1280" height="733" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23351866" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991362" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991362" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -417,66 +438,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/python_self/log.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python_self/data_iterator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="960">
-          <caret line="64" column="50" selection-start-line="64" selection-start-column="50" selection-end-line="64" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python_self/seq2seqmodel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2280">
-          <caret line="156" column="60" selection-start-line="156" selection-start-column="46" selection-end-line="156" selection-end-column="60" />
-          <folding>
-            <element signature="e#14#37#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python_self/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3390">
-          <caret line="229" column="13" selection-start-line="229" selection-start-column="13" selection-end-line="229" selection-end-column="13" />
-          <folding>
-            <element signature="e#15#24#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/script/train_keyword.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="20" selection-start-line="0" selection-start-column="20" selection-end-line="0" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python_self/train_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2610">
-          <caret line="185" column="0" selection-start-line="185" selection-start-column="0" selection-end-line="189" selection-end-column="23" />
-          <folding>
-            <element signature="e#15#38#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/python_self/predict.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4845">
@@ -766,7 +727,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python/run.py">
+    <entry file="file://$PROJECT_DIR$/python_v0/run.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -774,7 +735,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python/seqModel.py">
+    <entry file="file://$PROJECT_DIR$/python_v0/seqModel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1440">
           <caret line="653" column="136" selection-start-line="653" selection-start-column="132" selection-end-line="653" selection-end-column="136" />
@@ -792,20 +753,68 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/python_self/train_model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1674">
           <caret line="445" column="9" selection-start-line="445" selection-start-column="9" selection-end-line="445" selection-end-column="9" />
           <folding>
             <element signature="e#15#38#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_v0/predict.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="277" column="54" selection-start-line="277" selection-start-column="40" selection-end-line="277" selection-end-column="54" />
+          <folding>
+            <element signature="e#15#53#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_v0/train_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="468" column="28" selection-start-line="468" selection-start-column="28" selection-end-line="468" selection-end-column="28" />
+          <folding>
+            <element signature="e#15#53#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/train_keyword.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python/test/test_data_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python/generate_jobs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2313">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#9#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python/merge_jobs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="11" column="3" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
+          <folding>
+            <element signature="e#38#47#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -818,31 +827,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/script/train_keyword.sh">
+    <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="26" selection-start-line="14" selection-start-column="26" selection-end-line="14" selection-end-column="26" />
+        <state relative-caret-position="135">
+          <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python/read_hpc_output.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python/seqModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7932">
+          <caret line="957" column="20" selection-start-line="957" selection-start-column="10" selection-end-line="957" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/python/train_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="542" column="11" selection-start-line="542" selection-start-column="11" selection-end-line="542" selection-end-column="11" />
-          <folding>
-            <element signature="e#15#53#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="492">
+          <caret line="877" column="19" selection-start-line="877" selection-start-column="19" selection-end-line="877" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/python/predict.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="462" column="28" selection-start-line="462" selection-start-column="28" selection-end-line="462" selection-end-column="28" />
-          <folding>
-            <element signature="e#15#53#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="237">
+          <caret line="429" column="43" selection-start-line="429" selection-start-column="43" selection-end-line="429" selection-end-column="43" />
+          <folding />
         </state>
       </provider>
     </entry>

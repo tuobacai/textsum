@@ -16,7 +16,7 @@ class DataIterator:
         # first random bucket, then random sentences
         while True:
             random_number_01 = np.random.random_sample()
-            bucket_id = min([i for i in xrange(len(self.train_buckets_scale))
+            bucket_id = min([i for i in range(len(self.train_buckets_scale))
                              if self.train_buckets_scale[i] > random_number_01])
 
             source_inputs, target_inputs, target_outputs, target_weights, _ = self.model.get_batch(self.data_set, bucket_id)

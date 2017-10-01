@@ -1,4 +1,3 @@
-# coding:utf-8
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -16,7 +15,7 @@ import logging
 import data_utils
 from seqModel import SeqModel
 
-
+import data_iterator
 from data_iterator import DataIterator
 from tensorflow.python.client import timeline
 
@@ -24,6 +23,7 @@ from summary import ModelSummary, variable_summaries
 
 from google.protobuf import text_format
 
+from state import StateWrapper
 
 
 ############################
@@ -65,7 +65,7 @@ tf.app.flags.DEFINE_integer("from_vocab_size", 10000, "from vocabulary size.")
 tf.app.flags.DEFINE_integer("to_vocab_size", 10000, "to vocabulary size.")
 
 tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("n_epoch", 500,
                             "Maximum number of epochs in training.")
 
@@ -111,11 +111,8 @@ FLAGS = tf.app.flags.FLAGS
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 #_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
-# _buckets = [(10, 10), (22, 22)]
-# _beam_buckets = [10, 22]
-_buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
-# _beam_buckets = [30,35,40,41,42]
-_beam_buckets = [120,200,300,400,500]
+_buckets = [(10, 10), (22, 22)]
+_beam_buckets = [10, 22]
 
 
 def read_data(source_path, target_path, max_size=None):
@@ -172,7 +169,7 @@ def read_data_test(source_path):
 
                     order.append((bucket_id, len(data_set[bucket_id])))
                     data_set[bucket_id].append(source_ids)
-
+                    
                     break
             source = source_file.readline()
     return data_set, order
@@ -259,6 +256,7 @@ def create_model(session, run_options, run_metadata):
 
         mylog("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
+        session.run(tf.variables_initializer(model.beam_search_vars))
     else:
         mylog("Created model with fresh parameters.")
         session.run(tf.global_variables_initializer())
@@ -282,6 +280,7 @@ def train():
         FLAGS.dev_path_to,
         FLAGS.from_vocab_size,
         FLAGS.to_vocab_size)
+
 
     train_data_bucket = read_data(from_train,to_train)
     dev_data_bucket = read_data(from_dev,to_dev)
@@ -505,6 +504,344 @@ def evaluate(sess, model, data_set):
     return loss, ppx
 
 
+def force_decode():
+    # force_decode it: generate a file which contains every score and the final score; 
+    mylog_section("READ DATA")
+
+    test_data_bucket, _buckets, test_data_order = read_test(FLAGS.data_cache_dir, FLAGS.test_path, get_vocab_path(FLAGS.data_cache_dir), FLAGS.L, FLAGS.n_bucket)
+    vocab_path = get_vocab_path(FLAGS.data_cache_dir)
+    real_vocab_size = get_real_vocab_size(vocab_path)
+
+    FLAGS._buckets = _buckets
+    FLAGS.real_vocab_size = real_vocab_size
+
+    test_bucket_sizes = [len(test_data_bucket[b]) for b in xrange(len(_buckets))]
+    test_total_size = int(sum(test_bucket_sizes))
+
+    # reports
+    mylog_section("REPORT")
+    mylog("real_vocab_size: {}".format(FLAGS.real_vocab_size))
+    mylog("_buckets:{}".format(FLAGS._buckets))
+    mylog("FORCE_DECODE:")
+    mylog("total: {}".format(test_total_size))
+    mylog("bucket_sizes: {}".format(test_bucket_sizes))
+    
+    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
+    config.gpu_options.allow_growth = FLAGS.allow_growth
+
+    mylog_section("IN TENSORFLOW")
+    with tf.Session(config=config) as sess:
+
+        # runtime profile
+        if FLAGS.profile:
+            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+            run_metadata = tf.RunMetadata()
+        else:
+            run_options = None
+            run_metadata = None
+
+        mylog("Creating Model")
+        model = create_model(sess, run_options, run_metadata)
+                
+        mylog_section("All Variables")
+        show_all_variables()
+ 
+        sess.run(model.dropoutRate.assign(1.0))
+
+        start_id = 0
+        n_steps = 0
+        batch_size = FLAGS.batch_size
+
+        mylog_section("Data Iterators")
+        dite = DataIterator(model, test_data_bucket, len(_buckets), batch_size, None, data_order = test_data_order)
+        ite = dite.next_original()
+            
+        fdump = open(FLAGS.score_file,'w')
+
+        i_sent = 0
+
+        mylog_section("FORCE_DECODING")
+
+        for inputs, outputs, weights, bucket_id in ite:
+            # inputs: [[_GO],[1],[2],[3],[_EOS],[pad_id],[pad_id]]
+            # positions: [4]
+
+            mylog("--- decoding {}/{} sent ---".format(i_sent, test_total_size))
+            i_sent += 1
+            #print(inputs)
+            #print(outputs)
+            #print(weights)
+            #print(bucket_id)
+
+            L = model.step(sess, inputs, outputs, weights, bucket_id, forward_only = True, dump_lstm = False)
+            
+            mylog("LOSS: {}".format(L))
+
+            fdump.write("{}\n".format(L))
+        
+            # do the following convert:
+            # inputs: [[pad_id],[1],[2],[pad_id],[pad_id],[pad_id]]
+            # positions:[2]
+
+        fdump.close()
+            
+
+
+
+def beam_decode():
+
+    mylog("Reading Data...")
+
+    from_test = None
+
+    from_vocab_path, to_vocab_path, real_vocab_size_from, real_vocab_size_to = data_utils.get_vocab_info(FLAGS.data_cache_dir)
+    
+    FLAGS._buckets = _buckets
+    FLAGS._beam_buckets = _beam_buckets
+    FLAGS.real_vocab_size_from = real_vocab_size_from
+    FLAGS.real_vocab_size_to = real_vocab_size_to
+    
+    from_test = data_utils.prepare_test_data(
+        FLAGS.data_cache_dir,
+        FLAGS.test_path_from,
+        from_vocab_path)
+
+    test_data_bucket, test_data_order = read_data_test(from_test)
+
+    test_bucket_sizes = [len(test_data_bucket[b]) for b in xrange(len(_beam_buckets))]
+    test_total_size = int(sum(test_bucket_sizes))
+
+    # reports
+    mylog("from_vocab_size: {}".format(FLAGS.from_vocab_size))
+    mylog("to_vocab_size: {}".format(FLAGS.to_vocab_size))
+    mylog("_beam_buckets: {}".format(FLAGS._beam_buckets))
+    mylog("BEAM_DECODE:")
+    mylog("total: {}".format(test_total_size))
+    mylog("buckets: {}".format(test_bucket_sizes))
+    
+
+
+    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
+    config.gpu_options.allow_growth = FLAGS.allow_growth
+
+    with tf.Session(config=config) as sess:
+
+        # runtime profile
+        if FLAGS.profile:
+            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+            run_metadata = tf.RunMetadata()
+        else:
+            run_options = None
+            run_metadata = None
+
+        mylog("Creating Model")
+        model = create_model(sess, run_options, run_metadata)
+        show_all_variables()
+
+        sess.run(model.dropoutRate.assign(1.0))
+
+        start_id = 0
+        n_steps = 0
+        batch_size = FLAGS.batch_size
+    
+        dite = DataIterator(model, test_data_bucket, len(_beam_buckets), batch_size, None, data_order = test_data_order)
+        ite = dite.next_original()
+
+            
+        i_sent = 0
+
+        targets = []
+
+        for source_inputs, bucket_id, length in ite:
+
+            print("--- decoding {}/{} sent ---".format(i_sent, test_total_size))
+            i_sent += 1
+            
+
+            results = [] # (sentence,score)
+            scores = [0.0] * FLAGS.beam_size
+            sentences = [[] for x in xrange(FLAGS.beam_size)]
+            beam_parent = range(FLAGS.beam_size)
+
+            target_inputs = [data_utils.GO_ID] * FLAGS.beam_size
+            min_target_length = int(length * FLAGS.min_ratio) + 1
+            max_target_length = int(length * FLAGS.max_ratio) + 1 # include EOS
+            for i in xrange(max_target_length):
+                if i == 0:
+                    top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i, sources = source_inputs, target_inputs = target_inputs)
+                else:
+                    top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i,  target_inputs = target_inputs, beam_parent = beam_parent)
+
+                # top_value = [array[batch_size, batch_size]]
+                # top_index = [array[batch_size, batch_size]]
+                # eos_value = [array[batch_size, 1] ]
+                                        
+                # expand
+                global_queue = []
+
+                if i == 0:
+                    nrow = 1
+                else:
+                    nrow = FLAGS.beam_size
+
+                if i == max_target_length - 1: # last_step
+                    for row in xrange(nrow):
+
+                        score = scores[row] + np.log(eos_value[0][row,0])
+                        word_index = data_utils.EOS_ID
+                        beam_index = row
+                        global_queue.append((score, beam_index, word_index))                         
+
+                else:
+                    for row in xrange(nrow):
+                        for col in xrange(top_index[0].shape[1]):
+                            score = scores[row] + np.log(top_value[0][row,col])
+                            word_index = top_index[0][row,col]
+                            beam_index = row
+
+                            global_queue.append((score, beam_index, word_index))                         
+
+                global_queue = sorted(global_queue, key = lambda x : -x[0])
+
+
+                if FLAGS.print_beam:
+                    print("--------- Step {} --------".format(i))
+
+                target_inputs = []
+                beam_parent = []
+                scores = []
+                temp_sentences = []
+
+                for j, (score, beam_index, word_index) in enumerate(global_queue):
+                    if word_index == data_utils.EOS_ID:
+                        if len(sentences[beam_index])+1 < min_target_length:
+                            continue
+
+                        results.append((sentences[beam_index] + [word_index], score))
+                        if FLAGS.print_beam:
+                            print("*Beam:{} Father:{} word:{} score:{}".format(j,beam_index,word_index,score))
+                        continue
+                    
+                    if FLAGS.print_beam:
+                        print("Beam:{} Father:{} word:{} score:{}".format(j,beam_index,word_index,score))
+                    beam_parent.append(beam_index)
+
+                    
+                    target_inputs.append(word_index)
+                    scores.append(score)
+                    temp_sentences.append(sentences[beam_index] + [word_index])
+                    
+                    if len(scores) >= FLAGS.beam_size:
+                        break
+                   
+                # can not fill beam_size, just repeat the last one
+                while len(scores) < FLAGS.beam_size and i < max_target_length - 1:
+                    beam_parent.append(beam_parent[-1])
+                    target_inputs.append(target_inputs[-1])
+                    scores.append(scores[-1])
+                    temp_sentences.append(temp_sentences[-1])
+                
+                sentences = temp_sentences
+                    
+                # print the 1 best 
+            results = sorted(results, key = lambda x: -x[1])
+            
+            targets.append(results[0][0])
+            
+
+        data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
+                
+
+
+           
+def dump_lstm():
+    # dump the hidden states to some where
+    mylog_section("READ DATA")
+    test_data_bucket, _buckets, test_data_order = read_test(FLAGS.data_cache_dir, FLAGS.test_path, get_vocab_path(FLAGS.data_cache_dir), FLAGS.L, FLAGS.n_bucket)
+    vocab_path = get_vocab_path(FLAGS.data_cache_dir)
+    real_vocab_size = get_real_vocab_size(vocab_path)
+
+    FLAGS._buckets = _buckets
+    FLAGS.real_vocab_size = real_vocab_size
+
+    test_bucket_sizes = [len(test_data_bucket[b]) for b in xrange(len(_buckets))]
+    test_total_size = int(sum(test_bucket_sizes))
+
+    # reports
+    mylog_section("REPORT")
+
+    mylog("real_vocab_size: {}".format(FLAGS.real_vocab_size))
+    mylog("_buckets:{}".format(FLAGS._buckets))
+    mylog("DUMP_LSTM:")
+    mylog("total: {}".format(test_total_size))
+    mylog("buckets: {}".format(test_bucket_sizes))
+    
+    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
+    config.gpu_options.allow_growth = FLAGS.allow_growth
+    with tf.Session(config=config) as sess:
+
+        # runtime profile
+        if FLAGS.profile:
+            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+            run_metadata = tf.RunMetadata()
+        else:
+            run_options = None
+            run_metadata = None
+
+        mylog_section("MODEL")
+
+        mylog("Creating Model")
+        model = create_model(sess, run_options, run_metadata)
+        
+        mylog("Init tensors to dump")
+        model.init_dump_states()
+
+        #dump_graph('graph.txt')
+        mylog_section("All Variables")
+        show_all_variables()
+ 
+        sess.run(model.dropoutRate.assign(1.0))
+
+        start_id = 0
+        n_steps = 0
+        batch_size = FLAGS.batch_size
+
+        mylog_section("Data Iterators")
+
+        dite = DataIterator(model, test_data_bucket, len(_buckets), batch_size, None, data_order = test_data_order)
+        ite = dite.next_original()
+            
+        fdump = open(FLAGS.dump_file,'wb')
+
+        mylog_section("DUMP_LSTM")
+
+        i_sent = 0
+        for inputs, outputs, weights, bucket_id in ite:
+            # inputs: [[_GO],[1],[2],[3],[_EOS],[pad_id],[pad_id]]
+            # positions: [4]
+
+            mylog("--- decoding {}/{} sent ---".format(i_sent, test_total_size))
+            i_sent += 1
+            #print(inputs)
+            #print(outputs)
+            #print(weights)
+            #print(bucket_id)
+
+            L, states = model.step(sess, inputs, outputs, weights, bucket_id, forward_only = True, dump_lstm = True)
+            
+            mylog("LOSS: {}".format(L))
+            
+            sw = StateWrapper()
+            sw.create(inputs,outputs,weights,states)
+            sw.save_to_stream(fdump)
+            
+            # do the following convert:
+            # inputs: [[pad_id],[1],[2],[pad_id],[pad_id],[pad_id]]
+            # positions:[2]
+
+        fdump.close()
+        
+    
 
 
 
@@ -541,7 +878,7 @@ def main(_):
     parsing_flags()
 
     train()
-    
+
     logging.shutdown()
     
 if __name__ == "__main__":

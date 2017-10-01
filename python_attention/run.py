@@ -34,16 +34,16 @@ from state import StateWrapper
 tf.app.flags.DEFINE_string("mode", "TRAIN", "TRAIN|FORCE_DECODE|BEAM_DECODE|DUMP_LSTM")
 
 # datasets, paths, and preprocessing
-tf.app.flags.DEFINE_string("model_dir", "./model", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
-tf.app.flags.DEFINE_string("train_path_from", "./train", "the absolute path of raw source train file.")
-tf.app.flags.DEFINE_string("dev_path_from", "./dev", "the absolute path of raw source dev file.")
-tf.app.flags.DEFINE_string("test_path_from", "./test", "the absolute path of raw source test file.")
+tf.app.flags.DEFINE_string("model_dir", ".\\model\\model_small", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
+tf.app.flags.DEFINE_string("train_path_from", ".\\data\\small\\train.src", "the absolute path of raw source train file.")
+tf.app.flags.DEFINE_string("dev_path_from", ".\\data\\small\\valid.src", "the absolute path of raw source dev file.")
+tf.app.flags.DEFINE_string("test_path_from", ".\\data\\small\\test.src", "the absolute path of raw source test file.")
 
-tf.app.flags.DEFINE_string("train_path_to", "./train", "the absolute path of raw target train file.")
-tf.app.flags.DEFINE_string("dev_path_to", "./dev", "the absolute path of raw target dev file.")
-tf.app.flags.DEFINE_string("test_path_to", "./test", "the absolute path of raw target test file.")
+tf.app.flags.DEFINE_string("train_path_to", ".\\data\\small\\train.tgt", "the absolute path of raw target train file.")
+tf.app.flags.DEFINE_string("dev_path_to", ".\\data\\small\\valid.tgt", "the absolute path of raw target dev file.")
+tf.app.flags.DEFINE_string("test_path_to", ".\\data\\small\\test.tgt", "the absolute path of raw target test file.")
 
-tf.app.flags.DEFINE_string("decode_output", "./output", "beam search decode output.")
+tf.app.flags.DEFINE_string("decode_output", ".\\output\\beam_decode_output", "beam search decode output.")
 
 
 tf.app.flags.DEFINE_string("force_decode_output", "force_decode.txt", "the file name of the score file as the output of force_decode. The file will be put at model_dir/force_decode_output")
@@ -83,7 +83,7 @@ tf.app.flags.DEFINE_string("N", "000", "GPU layer distribution: [input_embedding
 tf.app.flags.DEFINE_boolean("withAdagrad", True,
                             "withAdagrad.")
 tf.app.flags.DEFINE_boolean("fromScratch", True,
-                            "withAdagrad.")
+                            "fromScratch.")
 tf.app.flags.DEFINE_boolean("saveCheckpoint", False,
                             "save Model at each checkpoint.")
 tf.app.flags.DEFINE_boolean("profile", False, "False = no profile, True = profile")
@@ -121,7 +121,7 @@ def read_data(source_path, target_path, max_size=None):
     source_path: path to the files with token-ids for the source language.
     target_path: path to the file with token-ids for the target language;
       it must be aligned with the source file: n-th line contains the desired
-      output for n-th line from the source_path.
+      output for n-th line from the source_path.d
     max_size: maximum number of lines to read, all other will be ignored;
       if 0 or None, data files will be read completely (no limit).
   Returns:
@@ -256,7 +256,6 @@ def create_model(session, run_options, run_metadata):
 
         mylog("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
-        session.run(tf.variables_initializer(model.beam_search_vars))
     else:
         mylog("Created model with fresh parameters.")
         session.run(tf.global_variables_initializer())
@@ -387,7 +386,7 @@ def train():
             start_time = time.time()
             
             # data and train
-            source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.next()
+            source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.__next__()
 
             L = model.step(sess, source_inputs, target_inputs, target_outputs, target_weights, bucket_id)
             
@@ -670,6 +669,7 @@ def beam_decode():
                 if i == 0:
                     top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i, sources = source_inputs, target_inputs = target_inputs)
                 else:
+
                     top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i,  target_inputs = target_inputs, beam_parent = beam_parent)
 
                 # top_value = [array[batch_size, batch_size]]
@@ -747,7 +747,6 @@ def beam_decode():
             results = sorted(results, key = lambda x: -x[1])
             
             targets.append(results[0][0])
-            
 
         data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
                 
@@ -877,6 +876,8 @@ def main(_):
     
     parsing_flags()
     
+    print(sys.path); 
+    sys.path.append("H:\\materials\\ml\\nlp\\xing_nlp-master\\Seq2Seq\\py")
     if FLAGS.mode == "TRAIN":
         train()
 
