@@ -154,28 +154,6 @@ def read_data(source_path, target_path, max_size=None):
   return data_set
 
 
-def read_data_test(source_path):
-
-    order = []
-    data_set = [[] for _ in _beam_buckets]
-    with tf.gfile.GFile(source_path, mode="r") as source_file:
-        source = source_file.readline()
-        counter = 0
-        while source:
-            counter += 1
-            if counter % 100000 == 0:
-                print("  reading data line %d" % counter)
-                sys.stdout.flush()
-            source_ids = [int(x) for x in source.split()][::-1]
-            for bucket_id, source_size in enumerate(_beam_buckets):
-                if len(source_ids) < source_size:
-
-                    order.append((bucket_id, len(data_set[bucket_id])))
-                    data_set[bucket_id].append(source_ids)
-                    
-                    break
-            source = source_file.readline()
-    return data_set, order
 
 
 
@@ -441,11 +419,11 @@ def train():
                 msg = "Learning_rate: {:.4f} Dev_ppx: {:.2f} Train_ppx: {:.2f}".format(learning_rate, dev_ppx, train_ppx)
                 mylog_line(sect_name, msg)
 
-                if FLAGS.with_summary:
-                    # save summary
-                    _summaries = modelSummary.step_record(sess, train_ppx, dev_ppx)
-                    for _summary in _summaries:
-                        summaryWriter.add_summary(_summary, i_checkpoint)
+                # if FLAGS.with_summary:
+                #     # save summary
+                #     _summaries = modelSummary.step_record(sess, train_ppx, dev_ppx)
+                #     for _summary in _summaries:
+                #         summaryWriter.add_summary(_summary, i_checkpoint)
                 
                 # save model per checkpoint
                 if FLAGS.saveCheckpoint:
