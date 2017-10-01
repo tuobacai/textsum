@@ -441,11 +441,11 @@ def train():
                 msg = "Learning_rate: {:.4f} Dev_ppx: {:.2f} Train_ppx: {:.2f}".format(learning_rate, dev_ppx, train_ppx)
                 mylog_line(sect_name, msg)
 
-                # if FLAGS.with_summary:
-                #     # save summary
-                #     _summaries = modelSummary.step_record(sess, train_ppx, dev_ppx)
-                #     for _summary in _summaries:
-                #         summaryWriter.add_summary(_summary, i_checkpoint)
+                if FLAGS.with_summary:
+                    # save summary
+                    _summaries = modelSummary.step_record(sess, train_ppx, dev_ppx)
+                    for _summary in _summaries:
+                        summaryWriter.add_summary(_summary, i_checkpoint)
                 
                 # save model per checkpoint
                 if FLAGS.saveCheckpoint:
