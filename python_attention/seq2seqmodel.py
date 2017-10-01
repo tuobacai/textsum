@@ -132,22 +132,20 @@ class Seq2SeqModel(object):
         # LSTM
         with tf.device(devices[1]):
             # for encoder
-            with tf.variable_scope("encoder_cell"):
-                if num_layers == 1:
-                    encoder_cell = lstm_cell()
-                else:
-                    encoder_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell() for _ in xrange(num_layers)],
-                                                               state_is_tuple=True)
-                encoder_cell = tf.contrib.rnn.DropoutWrapper(encoder_cell, output_keep_prob=self.dropoutRate)
+            if num_layers == 1:
+                encoder_cell = lstm_cell()
+            else:
+                encoder_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell() for _ in xrange(num_layers)],
+                                                           state_is_tuple=True)
+            encoder_cell = tf.contrib.rnn.DropoutWrapper(encoder_cell, output_keep_prob=self.dropoutRate)
 
             # for decoder
-            with tf.variable_scope("decoder_cell"):
-                if num_layers == 1:
-                    decoder_cell = lstm_cell()
-                else:
-                    decoder_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell() for _ in xrange(num_layers)],
-                                                               state_is_tuple=True)
-                decoder_cell = tf.contrib.rnn.DropoutWrapper(decoder_cell, output_keep_prob=self.dropoutRate)
+            if num_layers == 1:
+                decoder_cell = lstm_cell()
+            else:
+                decoder_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell() for _ in xrange(num_layers)],
+                                                           state_is_tuple=True)
+            decoder_cell = tf.contrib.rnn.DropoutWrapper(decoder_cell, output_keep_prob=self.dropoutRate)
 
         self.encoder_cell = encoder_cell
         self.decoder_cell = decoder_cell
