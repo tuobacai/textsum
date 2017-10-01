@@ -15,6 +15,7 @@ import logging
 import data_utils
 from seqModel import SeqModel
 
+import data_iterator
 from data_iterator import DataIterator
 from tensorflow.python.client import timeline
 
@@ -22,6 +23,7 @@ from summary import ModelSummary, variable_summaries
 
 from google.protobuf import text_format
 
+from state import StateWrapper
 
 
 ############################
@@ -32,16 +34,16 @@ from google.protobuf import text_format
 tf.app.flags.DEFINE_string("mode", "TRAIN", "TRAIN|FORCE_DECODE|BEAM_DECODE|DUMP_LSTM")
 
 # datasets, paths, and preprocessing
-tf.app.flags.DEFINE_string("model_dir", ".\\model\\model_small", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
-tf.app.flags.DEFINE_string("train_path_from", ".\\data\\small\\train.src", "the absolute path of raw source train file.")
-tf.app.flags.DEFINE_string("dev_path_from", ".\\data\\small\\valid.src", "the absolute path of raw source dev file.")
-tf.app.flags.DEFINE_string("test_path_from", ".\\data\\small\\test.src", "the absolute path of raw source test file.")
+tf.app.flags.DEFINE_string("model_dir", "./model", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
+tf.app.flags.DEFINE_string("train_path_from", "./train", "the absolute path of raw source train file.")
+tf.app.flags.DEFINE_string("dev_path_from", "./dev", "the absolute path of raw source dev file.")
+tf.app.flags.DEFINE_string("test_path_from", "./test", "the absolute path of raw source test file.")
 
-tf.app.flags.DEFINE_string("train_path_to", ".\\data\\small\\train.tgt", "the absolute path of raw target train file.")
-tf.app.flags.DEFINE_string("dev_path_to", ".\\data\\small\\valid.tgt", "the absolute path of raw target dev file.")
-tf.app.flags.DEFINE_string("test_path_to", ".\\data\\small\\test.tgt", "the absolute path of raw target test file.")
+tf.app.flags.DEFINE_string("train_path_to", "./train", "the absolute path of raw target train file.")
+tf.app.flags.DEFINE_string("dev_path_to", "./dev", "the absolute path of raw target dev file.")
+tf.app.flags.DEFINE_string("test_path_to", "./test", "the absolute path of raw target test file.")
 
-tf.app.flags.DEFINE_string("decode_output", ".\\output\\beam_decode_output", "beam search decode output.")
+tf.app.flags.DEFINE_string("decode_output", "./output", "beam search decode output.")
 
 
 tf.app.flags.DEFINE_string("force_decode_output", "force_decode.txt", "the file name of the score file as the output of force_decode. The file will be put at model_dir/force_decode_output")
@@ -63,7 +65,7 @@ tf.app.flags.DEFINE_integer("from_vocab_size", 10000, "from vocabulary size.")
 tf.app.flags.DEFINE_integer("to_vocab_size", 10000, "to vocabulary size.")
 
 tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("n_epoch", 500,
                             "Maximum number of epochs in training.")
 
@@ -109,8 +111,6 @@ FLAGS = tf.app.flags.FLAGS
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 #_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
-# _buckets = [(10, 10), (22, 22)]
-# _beam_buckets = [10, 22]
 _buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
 _beam_buckets = [120,200,300,400,500]
 
@@ -504,6 +504,9 @@ def evaluate(sess, model, data_set):
 
 
 
+
+
+
 def beam_decode():
 
     mylog("Reading Data...")
@@ -668,7 +671,6 @@ def beam_decode():
         data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
 
 
-
 def mkdir(path):
     if not os.path.exists(path):
         os.mkdir(path)
@@ -700,35 +702,11 @@ def parsing_flags():
 def main(_):
     
     parsing_flags()
-    
-    print(sys.path); 
-    sys.path.append("H:\\materials\\ml\\nlp\\xing_nlp-master\\Seq2Seq\\py")
-    if FLAGS.mode == "TRAIN":
-        train()
 
 
-    # not ready yet
-    if FLAGS.mode == 'FORCE_DECODE':
-        mylog("\nWARNING: \n 1. The output file and original file may not align one to one, because we remove the lines whose lenght exceeds the maximum length set by -L \n 2. The score is -sum(log(p)) with base e and includes EOS. \n")
-        
-        FLAGS.batch_size = 1
-        FLAGS.score_file = os.path.join(FLAGS.model_dir,FLAGS.force_decode_output)
-        #FLAGS.n_bucket = 1
-        force_decode()
+    train()
 
-    # not ready yet
-    if FLAGS.mode == 'DUMP_LSTM':
-        mylog("\nWARNING: The output file and original file may not align one to one, because we remove the lines whose lenght exceeds the maximum length set by -L \n")
-            
-        FLAGS.batch_size = 1
-        FLAGS.dump_file = os.path.join(FLAGS.model_dir,FLAGS.dump_lstm_output)
-        #FLAGS.n_bucket = 1
-        dump_lstm()
 
-    if FLAGS.mode == "BEAM_DECODE":
-        FLAGS.batch_size = FLAGS.beam_size
-        FLAGS.beam_search = True
-        beam_decode()
     
     logging.shutdown()
     

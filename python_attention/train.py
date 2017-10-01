@@ -34,16 +34,16 @@ from state import StateWrapper
 tf.app.flags.DEFINE_string("mode", "TRAIN", "TRAIN|FORCE_DECODE|BEAM_DECODE|DUMP_LSTM")
 
 # datasets, paths, and preprocessing
-tf.app.flags.DEFINE_string("model_dir", "./model", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
-tf.app.flags.DEFINE_string("train_path_from", "./train", "the absolute path of raw source train file.")
-tf.app.flags.DEFINE_string("dev_path_from", "./dev", "the absolute path of raw source dev file.")
-tf.app.flags.DEFINE_string("test_path_from", "./test", "the absolute path of raw source test file.")
+tf.app.flags.DEFINE_string("model_dir", ".\\model\\model_small", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
+tf.app.flags.DEFINE_string("train_path_from", ".\\data\\small\\train.src", "the absolute path of raw source train file.")
+tf.app.flags.DEFINE_string("dev_path_from", ".\\data\\small\\valid.src", "the absolute path of raw source dev file.")
+tf.app.flags.DEFINE_string("test_path_from", ".\\data\\small\\test.src", "the absolute path of raw source test file.")
 
-tf.app.flags.DEFINE_string("train_path_to", "./train", "the absolute path of raw target train file.")
-tf.app.flags.DEFINE_string("dev_path_to", "./dev", "the absolute path of raw target dev file.")
-tf.app.flags.DEFINE_string("test_path_to", "./test", "the absolute path of raw target test file.")
+tf.app.flags.DEFINE_string("train_path_to", ".\\data\\small\\train.tgt", "the absolute path of raw target train file.")
+tf.app.flags.DEFINE_string("dev_path_to", ".\\data\\small\\valid.tgt", "the absolute path of raw target dev file.")
+tf.app.flags.DEFINE_string("test_path_to", ".\\data\\small\\test.tgt", "the absolute path of raw target test file.")
 
-tf.app.flags.DEFINE_string("decode_output", "./output", "beam search decode output.")
+tf.app.flags.DEFINE_string("decode_output", ".\\output\\beam_decode_output", "beam search decode output.")
 
 
 tf.app.flags.DEFINE_string("force_decode_output", "force_decode.txt", "the file name of the score file as the output of force_decode. The file will be put at model_dir/force_decode_output")
@@ -65,7 +65,7 @@ tf.app.flags.DEFINE_integer("from_vocab_size", 10000, "from vocabulary size.")
 tf.app.flags.DEFINE_integer("to_vocab_size", 10000, "to vocabulary size.")
 
 tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("n_epoch", 500,
                             "Maximum number of epochs in training.")
 
@@ -111,6 +111,8 @@ FLAGS = tf.app.flags.FLAGS
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 #_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
+# _buckets = [(10, 10), (22, 22)]
+# _beam_buckets = [10, 22]
 _buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
 _beam_buckets = [120,200,300,400,500]
 
@@ -503,10 +505,6 @@ def evaluate(sess, model, data_set):
     return loss, ppx
 
 
-
-
-
-
 def beam_decode():
 
     mylog("Reading Data...")
@@ -703,10 +701,7 @@ def main(_):
     
     parsing_flags()
 
-
     train()
-
-
     
     logging.shutdown()
     
