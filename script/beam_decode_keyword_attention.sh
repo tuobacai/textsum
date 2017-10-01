@@ -1,5 +1,5 @@
 PY=../python_attention/predict.py
-BLEU=../python/multi-bleu.perl
+BLEU=../python_attention/multi-bleu.perl
 MODEL_DIR=../model/model_keyword
 TRAIN_PATH_FROM=../data/keyword/train_content.txt
 DEV_PATH_FROM=../data/keyword/dev_content.txt
@@ -7,7 +7,7 @@ TEST_PATH_FROM=../data/keyword/test_content.txt
 TRAIN_PATH_TO=../data/keyword/train_title.txt
 DEV_PATH_TO=../data/keyword/dev_title.txt
 TEST_PATH_TO=../data/keyword/test_title.txt
-DECODE_OUTPUT=../data/keyword/test.output
+DECODE_OUTPUT=../data/keyword/test_attention.output
 
 export CUDA_VISIBLE_DEVICES=1
 
