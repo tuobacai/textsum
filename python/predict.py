@@ -1,3 +1,4 @@
+# coding:utf-8
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -15,7 +16,7 @@ import logging
 import data_utils
 from seqModel import SeqModel
 
-import data_iterator
+
 from data_iterator import DataIterator
 from tensorflow.python.client import timeline
 
@@ -23,7 +24,6 @@ from summary import ModelSummary, variable_summaries
 
 from google.protobuf import text_format
 
-from state import StateWrapper
 
 
 ############################
@@ -65,7 +65,7 @@ tf.app.flags.DEFINE_integer("from_vocab_size", 10000, "from vocabulary size.")
 tf.app.flags.DEFINE_integer("to_vocab_size", 10000, "to vocabulary size.")
 
 tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("n_epoch", 500,
                             "Maximum number of epochs in training.")
 
@@ -111,8 +111,11 @@ FLAGS = tf.app.flags.FLAGS
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 #_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
-_buckets = [(10, 10), (22, 22)]
-_beam_buckets = [10, 22]
+# _buckets = [(10, 10), (22, 22)]
+# _beam_buckets = [10, 22]
+_buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
+# _beam_buckets = [30,35,40,41,42]
+_beam_buckets = [120,200,300,400,500]
 
 
 def read_data(source_path, target_path, max_size=None):
@@ -256,7 +259,6 @@ def create_model(session, run_options, run_metadata):
 
         mylog("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
-        session.run(tf.variables_initializer(model.beam_search_vars))
     else:
         mylog("Created model with fresh parameters.")
         session.run(tf.global_variables_initializer())
@@ -280,7 +282,6 @@ def train():
         FLAGS.dev_path_to,
         FLAGS.from_vocab_size,
         FLAGS.to_vocab_size)
-
 
     train_data_bucket = read_data(from_train,to_train)
     dev_data_bucket = read_data(from_dev,to_dev)
@@ -504,90 +505,6 @@ def evaluate(sess, model, data_set):
     return loss, ppx
 
 
-def force_decode():
-    # force_decode it: generate a file which contains every score and the final score; 
-    mylog_section("READ DATA")
-
-    test_data_bucket, _buckets, test_data_order = read_test(FLAGS.data_cache_dir, FLAGS.test_path, get_vocab_path(FLAGS.data_cache_dir), FLAGS.L, FLAGS.n_bucket)
-    vocab_path = get_vocab_path(FLAGS.data_cache_dir)
-    real_vocab_size = get_real_vocab_size(vocab_path)
-
-    FLAGS._buckets = _buckets
-    FLAGS.real_vocab_size = real_vocab_size
-
-    test_bucket_sizes = [len(test_data_bucket[b]) for b in xrange(len(_buckets))]
-    test_total_size = int(sum(test_bucket_sizes))
-
-    # reports
-    mylog_section("REPORT")
-    mylog("real_vocab_size: {}".format(FLAGS.real_vocab_size))
-    mylog("_buckets:{}".format(FLAGS._buckets))
-    mylog("FORCE_DECODE:")
-    mylog("total: {}".format(test_total_size))
-    mylog("bucket_sizes: {}".format(test_bucket_sizes))
-    
-    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
-    config.gpu_options.allow_growth = FLAGS.allow_growth
-
-    mylog_section("IN TENSORFLOW")
-    with tf.Session(config=config) as sess:
-
-        # runtime profile
-        if FLAGS.profile:
-            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-            run_metadata = tf.RunMetadata()
-        else:
-            run_options = None
-            run_metadata = None
-
-        mylog("Creating Model")
-        model = create_model(sess, run_options, run_metadata)
-                
-        mylog_section("All Variables")
-        show_all_variables()
- 
-        sess.run(model.dropoutRate.assign(1.0))
-
-        start_id = 0
-        n_steps = 0
-        batch_size = FLAGS.batch_size
-
-        mylog_section("Data Iterators")
-        dite = DataIterator(model, test_data_bucket, len(_buckets), batch_size, None, data_order = test_data_order)
-        ite = dite.next_original()
-            
-        fdump = open(FLAGS.score_file,'w')
-
-        i_sent = 0
-
-        mylog_section("FORCE_DECODING")
-
-        for inputs, outputs, weights, bucket_id in ite:
-            # inputs: [[_GO],[1],[2],[3],[_EOS],[pad_id],[pad_id]]
-            # positions: [4]
-
-            mylog("--- decoding {}/{} sent ---".format(i_sent, test_total_size))
-            i_sent += 1
-            #print(inputs)
-            #print(outputs)
-            #print(weights)
-            #print(bucket_id)
-
-            L = model.step(sess, inputs, outputs, weights, bucket_id, forward_only = True, dump_lstm = False)
-            
-            mylog("LOSS: {}".format(L))
-
-            fdump.write("{}\n".format(L))
-        
-            # do the following convert:
-            # inputs: [[pad_id],[1],[2],[pad_id],[pad_id],[pad_id]]
-            # positions:[2]
-
-        fdump.close()
-            
-
-
-
 def beam_decode():
 
     mylog("Reading Data...")
@@ -638,7 +555,7 @@ def beam_decode():
         model = create_model(sess, run_options, run_metadata)
         show_all_variables()
 
-        sess.run(model.dropoutRate.assign(1.0))
+        sess.run(model.dropoutRate.assign(1.0))#把droup释放掉
 
         start_id = 0
         n_steps = 0
@@ -666,10 +583,12 @@ def beam_decode():
             target_inputs = [data_utils.GO_ID] * FLAGS.beam_size
             min_target_length = int(length * FLAGS.min_ratio) + 1
             max_target_length = int(length * FLAGS.max_ratio) + 1 # include EOS
+            mylog('len:'+str(length)+';min_target_length'+str(min_target_length)+';max_target_length'+str(max_target_length))
             for i in xrange(max_target_length):
                 if i == 0:
                     top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i, sources = source_inputs, target_inputs = target_inputs)
                 else:
+
                     top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i,  target_inputs = target_inputs, beam_parent = beam_parent)
 
                 # top_value = [array[batch_size, batch_size]]
@@ -745,101 +664,12 @@ def beam_decode():
                     
                 # print the 1 best 
             results = sorted(results, key = lambda x: -x[1])
+
             
             targets.append(results[0][0])
-            
 
         data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
-                
 
-
-           
-def dump_lstm():
-    # dump the hidden states to some where
-    mylog_section("READ DATA")
-    test_data_bucket, _buckets, test_data_order = read_test(FLAGS.data_cache_dir, FLAGS.test_path, get_vocab_path(FLAGS.data_cache_dir), FLAGS.L, FLAGS.n_bucket)
-    vocab_path = get_vocab_path(FLAGS.data_cache_dir)
-    real_vocab_size = get_real_vocab_size(vocab_path)
-
-    FLAGS._buckets = _buckets
-    FLAGS.real_vocab_size = real_vocab_size
-
-    test_bucket_sizes = [len(test_data_bucket[b]) for b in xrange(len(_buckets))]
-    test_total_size = int(sum(test_bucket_sizes))
-
-    # reports
-    mylog_section("REPORT")
-
-    mylog("real_vocab_size: {}".format(FLAGS.real_vocab_size))
-    mylog("_buckets:{}".format(FLAGS._buckets))
-    mylog("DUMP_LSTM:")
-    mylog("total: {}".format(test_total_size))
-    mylog("buckets: {}".format(test_bucket_sizes))
-    
-    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement = False)
-    config.gpu_options.allow_growth = FLAGS.allow_growth
-    with tf.Session(config=config) as sess:
-
-        # runtime profile
-        if FLAGS.profile:
-            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-            run_metadata = tf.RunMetadata()
-        else:
-            run_options = None
-            run_metadata = None
-
-        mylog_section("MODEL")
-
-        mylog("Creating Model")
-        model = create_model(sess, run_options, run_metadata)
-        
-        mylog("Init tensors to dump")
-        model.init_dump_states()
-
-        #dump_graph('graph.txt')
-        mylog_section("All Variables")
-        show_all_variables()
- 
-        sess.run(model.dropoutRate.assign(1.0))
-
-        start_id = 0
-        n_steps = 0
-        batch_size = FLAGS.batch_size
-
-        mylog_section("Data Iterators")
-
-        dite = DataIterator(model, test_data_bucket, len(_buckets), batch_size, None, data_order = test_data_order)
-        ite = dite.next_original()
-            
-        fdump = open(FLAGS.dump_file,'wb')
-
-        mylog_section("DUMP_LSTM")
-
-        i_sent = 0
-        for inputs, outputs, weights, bucket_id in ite:
-            # inputs: [[_GO],[1],[2],[3],[_EOS],[pad_id],[pad_id]]
-            # positions: [4]
-
-            mylog("--- decoding {}/{} sent ---".format(i_sent, test_total_size))
-            i_sent += 1
-            #print(inputs)
-            #print(outputs)
-            #print(weights)
-            #print(bucket_id)
-
-            L, states = model.step(sess, inputs, outputs, weights, bucket_id, forward_only = True, dump_lstm = True)
-            
-            mylog("LOSS: {}".format(L))
-            
-            sw = StateWrapper()
-            sw.create(inputs,outputs,weights,states)
-            sw.save_to_stream(fdump)
-            
-            # do the following convert:
-            # inputs: [[pad_id],[1],[2],[pad_id],[pad_id],[pad_id]]
-            # positions:[2]
-
-        fdump.close()
         
     
 
@@ -876,6 +706,7 @@ def parsing_flags():
 def main(_):
     
     parsing_flags()
+    
 
     FLAGS.batch_size = FLAGS.beam_size
     FLAGS.beam_search = True
