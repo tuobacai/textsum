@@ -1,3 +1,4 @@
+# coding:utf-8
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -13,7 +14,8 @@ from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 import logging
 import data_utils
-from seqModel import SeqModel
+from seq2seqmodel import Seq2SeqModel
+
 
 from data_iterator import DataIterator
 from tensorflow.python.client import timeline
@@ -32,16 +34,16 @@ from google.protobuf import text_format
 tf.app.flags.DEFINE_string("mode", "TRAIN", "TRAIN|FORCE_DECODE|BEAM_DECODE|DUMP_LSTM")
 
 # datasets, paths, and preprocessing
-tf.app.flags.DEFINE_string("model_dir", ".\\model\\model_small", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
-tf.app.flags.DEFINE_string("train_path_from", ".\\data\\small\\train.src", "the absolute path of raw source train file.")
-tf.app.flags.DEFINE_string("dev_path_from", ".\\data\\small\\valid.src", "the absolute path of raw source dev file.")
-tf.app.flags.DEFINE_string("test_path_from", ".\\data\\small\\test.src", "the absolute path of raw source test file.")
+tf.app.flags.DEFINE_string("model_dir", "./model", "model_dir/data_cache/n model_dir/saved_model; model_dir/log.txt .")
+tf.app.flags.DEFINE_string("train_path_from", "./train", "the absolute path of raw source train file.")
+tf.app.flags.DEFINE_string("dev_path_from", "./dev", "the absolute path of raw source dev file.")
+tf.app.flags.DEFINE_string("test_path_from", "./test", "the absolute path of raw source test file.")
 
-tf.app.flags.DEFINE_string("train_path_to", ".\\data\\small\\train.tgt", "the absolute path of raw target train file.")
-tf.app.flags.DEFINE_string("dev_path_to", ".\\data\\small\\valid.tgt", "the absolute path of raw target dev file.")
-tf.app.flags.DEFINE_string("test_path_to", ".\\data\\small\\test.tgt", "the absolute path of raw target test file.")
+tf.app.flags.DEFINE_string("train_path_to", "./train", "the absolute path of raw target train file.")
+tf.app.flags.DEFINE_string("dev_path_to", "./dev", "the absolute path of raw target dev file.")
+tf.app.flags.DEFINE_string("test_path_to", "./test", "the absolute path of raw target test file.")
 
-tf.app.flags.DEFINE_string("decode_output", ".\\output\\beam_decode_output", "beam search decode output.")
+tf.app.flags.DEFINE_string("decode_output", "./output", "beam search decode output.")
 
 
 tf.app.flags.DEFINE_string("force_decode_output", "force_decode.txt", "the file name of the score file as the output of force_decode. The file will be put at model_dir/force_decode_output")
@@ -63,7 +65,7 @@ tf.app.flags.DEFINE_integer("from_vocab_size", 10000, "from vocabulary size.")
 tf.app.flags.DEFINE_integer("to_vocab_size", 10000, "to vocabulary size.")
 
 tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("n_epoch", 500,
                             "Maximum number of epochs in training.")
 
@@ -81,7 +83,7 @@ tf.app.flags.DEFINE_string("N", "000", "GPU layer distribution: [input_embedding
 tf.app.flags.DEFINE_boolean("withAdagrad", True,
                             "withAdagrad.")
 tf.app.flags.DEFINE_boolean("fromScratch", True,
-                            "fromScratch.")
+                            "withAdagrad.")
 tf.app.flags.DEFINE_boolean("saveCheckpoint", False,
                             "save Model at each checkpoint.")
 tf.app.flags.DEFINE_boolean("profile", False, "False = no profile, True = profile")
@@ -112,6 +114,7 @@ FLAGS = tf.app.flags.FLAGS
 # _buckets = [(10, 10), (22, 22)]
 # _beam_buckets = [10, 22]
 _buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
+# _beam_buckets = [30,35,40,41,42]
 _beam_buckets = [120,200,300,400,500]
 
 
@@ -121,7 +124,7 @@ def read_data(source_path, target_path, max_size=None):
     source_path: path to the files with token-ids for the source language.
     target_path: path to the file with token-ids for the target language;
       it must be aligned with the source file: n-th line contains the desired
-      output for n-th line from the source_path.d
+      output for n-th line from the source_path.
     max_size: maximum number of lines to read, all other will be ignored;
       if 0 or None, data files will be read completely (no limit).
   Returns:
@@ -228,7 +231,7 @@ def log_flags():
 def create_model(session, run_options, run_metadata):
     devices = get_device_address(FLAGS.N)
     dtype = tf.float32
-    model = SeqModel(FLAGS._buckets,
+    model = Seq2SeqModel(FLAGS._buckets,
                      FLAGS.size,
                      FLAGS.real_vocab_size_from,
                      FLAGS.real_vocab_size_to,
@@ -279,7 +282,6 @@ def train():
         FLAGS.dev_path_to,
         FLAGS.from_vocab_size,
         FLAGS.to_vocab_size)
-
 
     train_data_bucket = read_data(from_train,to_train)
     dev_data_bucket = read_data(from_dev,to_dev)
@@ -386,7 +388,7 @@ def train():
             start_time = time.time()
             
             # data and train
-            source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.__next__()
+            source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.next()
 
             L = model.step(sess, source_inputs, target_inputs, target_outputs, target_weights, bucket_id)
             
@@ -503,7 +505,6 @@ def evaluate(sess, model, data_set):
     return loss, ppx
 
 
-
 def beam_decode():
 
     mylog("Reading Data...")
@@ -554,7 +555,7 @@ def beam_decode():
         model = create_model(sess, run_options, run_metadata)
         show_all_variables()
 
-        sess.run(model.dropoutRate.assign(1.0))
+        sess.run(model.dropoutRate.assign(1.0))#把droup释放掉
 
         start_id = 0
         n_steps = 0
@@ -582,6 +583,7 @@ def beam_decode():
             target_inputs = [data_utils.GO_ID] * FLAGS.beam_size
             min_target_length = int(length * FLAGS.min_ratio) + 1
             max_target_length = int(length * FLAGS.max_ratio) + 1 # include EOS
+            mylog('len:'+str(length)+';min_target_length'+str(min_target_length)+';max_target_length'+str(max_target_length))
             for i in xrange(max_target_length):
                 if i == 0:
                     top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i, sources = source_inputs, target_inputs = target_inputs)
@@ -662,10 +664,14 @@ def beam_decode():
                     
                 # print the 1 best 
             results = sorted(results, key = lambda x: -x[1])
+
             
             targets.append(results[0][0])
 
         data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
+
+        
+    
 
 
 
@@ -701,34 +707,10 @@ def main(_):
     
     parsing_flags()
     
-    print(sys.path); 
-    sys.path.append("H:\\materials\\ml\\nlp\\xing_nlp-master\\Seq2Seq\\py")
-    if FLAGS.mode == "TRAIN":
-        train()
 
-
-    # not ready yet
-    if FLAGS.mode == 'FORCE_DECODE':
-        mylog("\nWARNING: \n 1. The output file and original file may not align one to one, because we remove the lines whose lenght exceeds the maximum length set by -L \n 2. The score is -sum(log(p)) with base e and includes EOS. \n")
-        
-        FLAGS.batch_size = 1
-        FLAGS.score_file = os.path.join(FLAGS.model_dir,FLAGS.force_decode_output)
-        #FLAGS.n_bucket = 1
-        force_decode()
-
-    # not ready yet
-    if FLAGS.mode == 'DUMP_LSTM':
-        mylog("\nWARNING: The output file and original file may not align one to one, because we remove the lines whose lenght exceeds the maximum length set by -L \n")
-            
-        FLAGS.batch_size = 1
-        FLAGS.dump_file = os.path.join(FLAGS.model_dir,FLAGS.dump_lstm_output)
-        #FLAGS.n_bucket = 1
-        dump_lstm()
-
-    if FLAGS.mode == "BEAM_DECODE":
-        FLAGS.batch_size = FLAGS.beam_size
-        FLAGS.beam_search = True
-        beam_decode()
+    FLAGS.batch_size = FLAGS.beam_size
+    FLAGS.beam_search = True
+    beam_decode()
     
     logging.shutdown()
     

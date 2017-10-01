@@ -2,9 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e7245e63-f68b-4b5c-a2e2-cbe5b6067f4d" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/predict.py" afterPath="$PROJECT_DIR$/python_attention/predicts.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/train.py" afterPath="$PROJECT_DIR$/python_attention/trains.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attention/seq2seqmodel.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/python_attentions/train.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/best_buckets.py" afterPath="$PROJECT_DIR$/python_attentions/best_buckets.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/data_iterator.py" afterPath="$PROJECT_DIR$/python_attentions/data_iterator.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/data_utils.py" afterPath="$PROJECT_DIR$/python_attentions/data_utils.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/generate_jobs.py" afterPath="$PROJECT_DIR$/python_attentions/generate_jobs.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/merge_jobs.py" afterPath="$PROJECT_DIR$/python_attentions/merge_jobs.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/multi-bleu.perl" afterPath="$PROJECT_DIR$/python_attentions/multi-bleu.perl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/predict.py" afterPath="$PROJECT_DIR$/python_attentions/predict.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/predicts.py" afterPath="$PROJECT_DIR$/python_attentions/predicts.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/read_hpc_output.py" afterPath="$PROJECT_DIR$/python_attentions/read_hpc_output.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/run.py" afterPath="$PROJECT_DIR$/python_attentions/run.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/seqModel.py" afterPath="$PROJECT_DIR$/python_attentions/seqModel.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/state.proto" afterPath="$PROJECT_DIR$/python_attentions/state.proto" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/state.py" afterPath="$PROJECT_DIR$/python_attentions/state.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/state_pb2.py" afterPath="$PROJECT_DIR$/python_attentions/state_pb2.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/summary.py" afterPath="$PROJECT_DIR$/python_attentions/summary.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/python_attention/trains.py" afterPath="$PROJECT_DIR$/python_attentions/trains.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python_attention/train.py" afterPath="$PROJECT_DIR$/python_attention/train.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script/beam_decode_keyword_attention.sh" afterPath="$PROJECT_DIR$/script/beam_decode_keyword_attention.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script/train_keyword_attention.sh" afterPath="$PROJECT_DIR$/script/train_keyword_attention.sh" />
     </list>
     <ignored path="textsum.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,44 +44,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="trains.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/python_attention/trains.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1320">
-              <caret line="113" column="0" selection-start-line="113" selection-start-column="0" selection-end-line="114" selection-end-column="37" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python_attention/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10170">
-              <caret line="703" column="11" selection-start-line="703" selection-start-column="11" selection-end-line="703" selection-end-column="11" />
+            <state relative-caret-position="240">
+              <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="predict.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="predict.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python_attention/predict.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-225">
-              <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+            <state relative-caret-position="333">
+              <caret line="707" column="19" selection-start-line="707" selection-start-column="19" selection-end-line="707" selection-end-column="19" />
               <folding>
-                <element signature="e#0#38#0" expanded="true" />
+                <element signature="e#15#53#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="predicts.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/python_attention/predicts.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="113" selection-end-column="37" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -70,28 +69,28 @@
       <file leaf-file-name="train_keyword_attention.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/script/train_keyword_attention.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="37" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
+            <state relative-caret-position="285">
+              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="beam_decode_keyword_attention.sh" pinned="false" current-in-tab="false">
+      <file leaf-file-name="beam_decode_keyword_attention.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword_attention.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+            <state relative-caret-position="255">
+              <caret line="17" column="21" selection-start-line="17" selection-start-column="21" selection-end-line="17" selection-end-column="21" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="seqModel.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/python_attention/seqModel.py">
+      <file leaf-file-name="seq2seqmodel.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/python_attention/seq2seqmodel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10230">
-              <caret line="682" column="86" selection-start-line="682" selection-start-column="64" selection-end-line="682" selection-end-column="86" />
+            <state relative-caret-position="255">
+              <caret line="24" column="18" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="18" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
@@ -132,10 +131,11 @@
         <option value="$PROJECT_DIR$/python/train_model.py" />
         <option value="$PROJECT_DIR$/python/predict.py" />
         <option value="$PROJECT_DIR$/python_attention/test.py" />
-        <option value="$PROJECT_DIR$/script/train_keyword_attention.sh" />
-        <option value="$PROJECT_DIR$/script/beam_decode_keyword_attention.sh" />
+        <option value="$PROJECT_DIR$/python_attention/seq2seqmodel.py" />
         <option value="$PROJECT_DIR$/python_attention/train.py" />
         <option value="$PROJECT_DIR$/python_attention/predict.py" />
+        <option value="$PROJECT_DIR$/script/train_keyword_attention.sh" />
+        <option value="$PROJECT_DIR$/script/beam_decode_keyword_attention.sh" />
       </list>
     </option>
   </component>
@@ -228,9 +228,9 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/python_attention" />
       <recent name="$PROJECT_DIR$/script" />
-      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/python" />
       <recent name="$PROJECT_DIR$/data" />
     </key>
@@ -453,42 +453,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="20" selection-start-line="0" selection-start-column="20" selection-end-line="0" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/enfr/test_french.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/keyword/test_content.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/keyword/test_title.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model/placeholder.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/keyword/dev_title.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -644,7 +608,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/python_attention/test/test_data_util.py" />
-    <entry file="file://$PROJECT_DIR$/python_attention/generate_jobs.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/generate_jobs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2313">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -654,14 +618,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/merge_jobs.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/merge_jobs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/read_hpc_output.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/read_hpc_output.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="29" selection-start-line="0" selection-start-column="29" selection-end-line="0" selection-end-column="29" />
@@ -670,20 +634,10 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/python_attention/test.py" />
-    <entry file="file://$PROJECT_DIR$/python_attention/state_pb2.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/state_pb2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/seqModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10230">
-          <caret line="682" column="86" selection-start-line="682" selection-start-column="64" selection-end-line="682" selection-end-column="86" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -695,23 +649,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword_attention.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/script/train_keyword_attention.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="37" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/trains.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/trains.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1320">
           <caret line="113" column="0" selection-start-line="113" selection-start-column="0" selection-end-line="114" selection-end-column="37" />
@@ -719,7 +657,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/train.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/train.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="10170">
           <caret line="703" column="11" selection-start-line="703" selection-start-column="11" selection-end-line="703" selection-end-column="11" />
@@ -727,7 +665,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/predicts.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/predict.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="43" column="17" selection-start-line="43" selection-start-column="17" selection-end-line="43" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_attention/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_attentions/predicts.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="113" selection-end-column="37" />
@@ -735,13 +691,67 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python_attention/predict.py">
+    <entry file="file://$PROJECT_DIR$/python_attentions/seqModel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-225">
-          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        <state relative-caret-position="15">
+          <caret line="682" column="86" selection-start-line="682" selection-start-column="64" selection-end-line="682" selection-end-column="86" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_attentions/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_attention/seq2seqmodel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="24" column="18" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_attention/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python_attention/predict.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="333">
+          <caret line="707" column="19" selection-start-line="707" selection-start-column="19" selection-end-line="707" selection-end-column="19" />
+          <folding>
+            <element signature="e#15#53#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/train_keyword_attention.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/beam_decode_keyword_attention.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="21" selection-start-line="17" selection-start-column="21" selection-end-line="17" selection-end-column="21" />
+          <folding />
         </state>
       </provider>
     </entry>
