@@ -1,6 +1,6 @@
 PY=../python_attention/predict.py
 BLEU=../python_attention/multi-bleu.perl
-MODEL_DIR=../model/model_keyword
+MODEL_DIR=../model/model_keyword_attention
 TRAIN_PATH_FROM=../data/keyword/train_content.txt
 DEV_PATH_FROM=../data/keyword/dev_content.txt
 TEST_PATH_FROM=../data/keyword/test_content.txt
