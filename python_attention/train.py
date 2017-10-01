@@ -1,4 +1,3 @@
-# coding:utf-8
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -16,7 +15,7 @@ import logging
 import data_utils
 from seqModel import SeqModel
 
-
+import data_iterator
 from data_iterator import DataIterator
 from tensorflow.python.client import timeline
 
@@ -24,6 +23,7 @@ from summary import ModelSummary, variable_summaries
 
 from google.protobuf import text_format
 
+from state import StateWrapper
 
 
 ############################
@@ -83,7 +83,7 @@ tf.app.flags.DEFINE_string("N", "000", "GPU layer distribution: [input_embedding
 tf.app.flags.DEFINE_boolean("withAdagrad", True,
                             "withAdagrad.")
 tf.app.flags.DEFINE_boolean("fromScratch", True,
-                            "withAdagrad.")
+                            "fromScratch.")
 tf.app.flags.DEFINE_boolean("saveCheckpoint", False,
                             "save Model at each checkpoint.")
 tf.app.flags.DEFINE_boolean("profile", False, "False = no profile, True = profile")
@@ -111,10 +111,7 @@ FLAGS = tf.app.flags.FLAGS
 # We use a number of buckets and pad to the closest one for efficiency.
 # See seq2seq_model.Seq2SeqModel for details of how they work.
 #_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
-# _buckets = [(10, 10), (22, 22)]
-# _beam_buckets = [10, 22]
 _buckets =buckets = [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
-# _beam_buckets = [30,35,40,41,42]
 _beam_buckets = [120,200,300,400,500]
 
 
@@ -124,7 +121,7 @@ def read_data(source_path, target_path, max_size=None):
     source_path: path to the files with token-ids for the source language.
     target_path: path to the file with token-ids for the target language;
       it must be aligned with the source file: n-th line contains the desired
-      output for n-th line from the source_path.
+      output for n-th line from the source_path.d
     max_size: maximum number of lines to read, all other will be ignored;
       if 0 or None, data files will be read completely (no limit).
   Returns:
@@ -283,6 +280,7 @@ def train():
         FLAGS.from_vocab_size,
         FLAGS.to_vocab_size)
 
+
     train_data_bucket = read_data(from_train,to_train)
     dev_data_bucket = read_data(from_dev,to_dev)
     _,_,real_vocab_size_from,real_vocab_size_to = data_utils.get_vocab_info(FLAGS.data_cache_dir)
@@ -388,7 +386,7 @@ def train():
             start_time = time.time()
             
             # data and train
-            source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.next()
+            source_inputs, target_inputs, target_outputs, target_weights, bucket_id = ite.__next__()
 
             L = model.step(sess, source_inputs, target_inputs, target_outputs, target_weights, bucket_id)
             
@@ -505,6 +503,10 @@ def evaluate(sess, model, data_set):
     return loss, ppx
 
 
+
+
+
+
 def beam_decode():
 
     mylog("Reading Data...")
@@ -555,7 +557,7 @@ def beam_decode():
         model = create_model(sess, run_options, run_metadata)
         show_all_variables()
 
-        sess.run(model.dropoutRate.assign(1.0))#把droup释放掉
+        sess.run(model.dropoutRate.assign(1.0))
 
         start_id = 0
         n_steps = 0
@@ -583,7 +585,6 @@ def beam_decode():
             target_inputs = [data_utils.GO_ID] * FLAGS.beam_size
             min_target_length = int(length * FLAGS.min_ratio) + 1
             max_target_length = int(length * FLAGS.max_ratio) + 1 # include EOS
-            mylog('len:'+str(length)+';min_target_length'+str(min_target_length)+';max_target_length'+str(max_target_length))
             for i in xrange(max_target_length):
                 if i == 0:
                     top_value, top_index, eos_value = model.beam_step(sess, bucket_id, index=i, sources = source_inputs, target_inputs = target_inputs)
@@ -664,15 +665,10 @@ def beam_decode():
                     
                 # print the 1 best 
             results = sorted(results, key = lambda x: -x[1])
-
             
             targets.append(results[0][0])
 
         data_utils.ids_to_tokens(targets, to_vocab_path, FLAGS.decode_output)
-
-        
-    
-
 
 
 def mkdir(path):
@@ -706,15 +702,11 @@ def parsing_flags():
 def main(_):
     
     parsing_flags()
-    
-    if FLAGS.mode == "TRAIN":
-        train()
 
 
-    if FLAGS.mode == "BEAM_DECODE":
-        FLAGS.batch_size = FLAGS.beam_size
-        FLAGS.beam_search = True
-        beam_decode()
+    train()
+
+
     
     logging.shutdown()
     
