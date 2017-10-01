@@ -14,7 +14,7 @@ from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 import logging
 import data_utils
-from seq2seqmodel import Seq2SeqModel
+from seqModel import SeqModel
 
 
 from data_iterator import DataIterator
@@ -231,7 +231,7 @@ def log_flags():
 def create_model(session, run_options, run_metadata):
     devices = get_device_address(FLAGS.N)
     dtype = tf.float32
-    model = Seq2SeqModel(FLAGS._buckets,
+    model = SeqModel(FLAGS._buckets,
                      FLAGS.size,
                      FLAGS.real_vocab_size_from,
                      FLAGS.real_vocab_size_to,
