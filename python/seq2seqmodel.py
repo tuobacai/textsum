@@ -22,7 +22,7 @@ import data_iterator
 
 # import env
 
-class SeqModel(object):
+class Seq2SeqModel(object):
     
     def __init__(self,
                  buckets,
