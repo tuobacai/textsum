@@ -1,0 +1,146 @@
+INFO:root:======== FLAGS ========
+INFO:root:to_vocab_size=10000
+INFO:root:learning_rate_decay_factor=0.83
+INFO:root:dump_lstm_output=dump_lstm.pb
+INFO:root:print_beam=False
+INFO:root:dev_path_to=../data/keyword/dev_title.txt
+INFO:root:keep_prob=0.7
+INFO:root:with_summary=False
+INFO:root:test_path_from=./test
+INFO:root:patience=10
+INFO:root:num_layers=2
+INFO:root:size=128
+INFO:root:train_path_from=../data/keyword/train_content.txt
+INFO:root:from_vocab_size=10000
+INFO:root:model_dir=../model/model_keyword_attention
+INFO:root:summary_dir=../model/model_keyword_attention/saved_model
+INFO:root:force_decode_output=force_decode.txt
+INFO:root:profile=False
+INFO:root:saveCheckpoint=True
+INFO:root:fromScratch=True
+INFO:root:learning_rate=0.1
+INFO:root:max_ratio=1.5
+INFO:root:batch_size=64
+INFO:root:N=000
+INFO:root:data_cache_dir=../model/model_keyword_attention/data_cache
+INFO:root:min_ratio=0.5
+INFO:root:max_gradient_norm=5.0
+INFO:root:saved_model_dir=../model/model_keyword_attention/saved_model
+INFO:root:test_path_to=./test
+INFO:root:decode_output=./output
+INFO:root:n_bucket=10
+INFO:root:train_path_to=../data/keyword/train_title.txt
+INFO:root:beam_search=False
+INFO:root:allow_growth=False
+INFO:root:beam_size=10
+INFO:root:mode=TRAIN
+INFO:root:attention=True
+INFO:root:n_epoch=10
+INFO:root:withAdagrad=True
+INFO:root:dev_path_from=../data/keyword/dev_content.txt
+INFO:root:======== READ DATA ========
+INFO:root:======== REPORT ========
+INFO:root:from_vocab_size: 10000
+INFO:root:to_vocab_size: 10000
+INFO:root:_buckets: [(120, 30), (200, 35), (300, 40), (400, 41), (500, 42)]
+INFO:root:Train:
+INFO:root:total: 308.0
+INFO:root:bucket sizes: [64, 96, 68, 44, 36]
+INFO:root:Dev:
+INFO:root:total: 161
+INFO:root:bucket sizes: [35, 48, 41, 20, 17]
+INFO:root:Steps_per_epoch: 4
+INFO:root:Total_steps:40
+INFO:root:Steps_per_checkpoint: 2
+INFO:root:======== IN TENSORFLOW ========
+INFO:root:======== MODEL/SUMMARY/WRITER ========
+INFO:root:Creating Model.. (this can take a few minutes)
+INFO:root:Created model with fresh parameters.
+INFO:root:======== All Variables ========
+INFO:root:Variable:0
+INFO:root:Variable_1:0
+INFO:root:Variable_2:0
+INFO:root:source_input_embedding:0
+INFO:root:input_embedding:0
+INFO:root:output_embedding:0
+INFO:root:output_bias:0
+INFO:root:attention_seq2seq/a_w_source:0
+INFO:root:attention_seq2seq/a_w_target:0
+INFO:root:attention_seq2seq/a_b:0
+INFO:root:attention_seq2seq/a_v:0
+INFO:root:attention_seq2seq/h_w_context:0
+INFO:root:attention_seq2seq/h_w_target:0
+INFO:root:attention_seq2seq/h_b:0
+INFO:root:attention_seq2seq/fi_w_x:0
+INFO:root:attention_seq2seq/fi_w_att:0
+INFO:root:attention_seq2seq/fi_b:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_0/lstm_cell/kernel:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_0/lstm_cell/bias:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_1/lstm_cell/kernel:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_1/lstm_cell/bias:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_0/lstm_cell/kernel:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_0/lstm_cell/bias:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_1/lstm_cell/kernel:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_1/lstm_cell/bias:0
+INFO:root:source_input_embedding/Adagrad:0
+INFO:root:input_embedding/Adagrad:0
+INFO:root:output_embedding/Adagrad:0
+INFO:root:output_bias/Adagrad:0
+INFO:root:attention_seq2seq/a_w_source/Adagrad:0
+INFO:root:attention_seq2seq/a_w_target/Adagrad:0
+INFO:root:attention_seq2seq/a_b/Adagrad:0
+INFO:root:attention_seq2seq/a_v/Adagrad:0
+INFO:root:attention_seq2seq/h_w_context/Adagrad:0
+INFO:root:attention_seq2seq/h_w_target/Adagrad:0
+INFO:root:attention_seq2seq/h_b/Adagrad:0
+INFO:root:attention_seq2seq/fi_w_x/Adagrad:0
+INFO:root:attention_seq2seq/fi_w_att/Adagrad:0
+INFO:root:attention_seq2seq/fi_b/Adagrad:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_0/lstm_cell/kernel/Adagrad:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_0/lstm_cell/bias/Adagrad:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_1/lstm_cell/kernel/Adagrad:0
+INFO:root:attention_seq2seq/encoder/rnn/multi_rnn_cell/cell_1/lstm_cell/bias/Adagrad:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_0/lstm_cell/kernel/Adagrad:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_0/lstm_cell/bias/Adagrad:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_1/lstm_cell/kernel/Adagrad:0
+INFO:root:attention_seq2seq/decoder/multi_rnn_cell/cell_1/lstm_cell/bias/Adagrad:0
+INFO:root:======== Data Iterators ========
+INFO:root:Itetype: withRandom
+INFO:root:======== TRAIN ========
+INFO:root:[CHECKPOINT 1 STEP 2] Learning_rate: 0.1000 Dev_ppx: 986.97 Train_ppx: 1589.40
+INFO:root:[CHECKPOINT 1 STEP 2] Model saved using 2.02 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 1 STEP 2] Model saved using 2.63 sec at ../model/model_keyword_attention/saved_model/best
+INFO:root:[CHECKPOINT 2 STEP 4] Learning_rate: 0.1000 Dev_ppx: 962.42 Train_ppx: 1678.94
+INFO:root:[CHECKPOINT 2 STEP 4] Model saved using 0.03 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 2 STEP 4] Model saved using 0.05 sec at ../model/model_keyword_attention/saved_model/best
+INFO:root:[CHECKPOINT 3 STEP 6] Learning_rate: 0.1000 Dev_ppx: 1027.10 Train_ppx: 1205.65
+INFO:root:[CHECKPOINT 3 STEP 6] Model saved using 0.03 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 4 STEP 8] Learning_rate: 0.1000 Dev_ppx: 976.99 Train_ppx: 881.61
+INFO:root:[CHECKPOINT 4 STEP 8] Model saved using 0.03 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 5 STEP 10] Learning_rate: 0.1000 Dev_ppx: 972.60 Train_ppx: 856.85
+INFO:root:[CHECKPOINT 5 STEP 10] Model saved using 0.02 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 6 STEP 12] Learning_rate: 0.1000 Dev_ppx: 954.60 Train_ppx: 823.41
+INFO:root:[CHECKPOINT 6 STEP 12] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 6 STEP 12] Model saved using 0.05 sec at ../model/model_keyword_attention/saved_model/best
+INFO:root:[CHECKPOINT 7 STEP 14] Learning_rate: 0.1000 Dev_ppx: 969.45 Train_ppx: 757.56
+INFO:root:[CHECKPOINT 7 STEP 14] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 8 STEP 16] Learning_rate: 0.1000 Dev_ppx: 969.69 Train_ppx: 860.65
+INFO:root:[CHECKPOINT 8 STEP 16] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 9 STEP 18] Learning_rate: 0.1000 Dev_ppx: 959.42 Train_ppx: 906.69
+INFO:root:[CHECKPOINT 9 STEP 18] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 10 STEP 20] Learning_rate: 0.1000 Dev_ppx: 966.25 Train_ppx: 779.52
+INFO:root:[CHECKPOINT 10 STEP 20] Model saved using 0.05 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 11 STEP 22] Learning_rate: 0.1000 Dev_ppx: 987.81 Train_ppx: 676.07
+INFO:root:[CHECKPOINT 11 STEP 22] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 12 STEP 24] Learning_rate: 0.1000 Dev_ppx: 1008.27 Train_ppx: 767.52
+INFO:root:[CHECKPOINT 12 STEP 24] Model saved using 0.05 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 13 STEP 26] Learning_rate: 0.1000 Dev_ppx: 1052.65 Train_ppx: 780.37
+INFO:root:[CHECKPOINT 13 STEP 26] Model saved using 0.05 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 14 STEP 28] Learning_rate: 0.1000 Dev_ppx: 1030.44 Train_ppx: 633.58
+INFO:root:[CHECKPOINT 14 STEP 28] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[STEP 30] StepTime: 4.00 sec Speed: 114.43 targets/s Total_targets: 2212
+INFO:root:[CHECKPOINT 15 STEP 30] Learning_rate: 0.1000 Dev_ppx: 1037.02 Train_ppx: 537.58
+INFO:root:[CHECKPOINT 15 STEP 30] Model saved using 0.05 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:[CHECKPOINT 16 STEP 32] Learning_rate: 0.1000 Dev_ppx: 1120.83 Train_ppx: 705.21
+INFO:root:[CHECKPOINT 16 STEP 32] Model saved using 0.04 sec at ../model/model_keyword_attention/saved_model/model
+INFO:root:Training finished. Running out of patience.
